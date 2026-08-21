@@ -1,0 +1,103 @@
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import { parseFeed } from './feed.js'
+import { guessCategory, shouldCollect } from './keywords.js'
+
+const RSS2 = `<?xml version="1.0"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>テストニュース</title>
+    <item>
+      <title>チョコミント新商品が今夏も登場</title>
+      <link>https://example.com/a</link>
+      <pubDate>Tue, 18 Aug 2026 02:00:00 GMT</pubDate>
+      <media:content url="https://example.com/a.jpg"/>
+    </item>
+    <item>
+      <title>まったく関係のないニュース</title>
+      <link>https://example.com/b</link>
+      <pubDate>Tue, 18 Aug 2026 03:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>`
+
+const RDF = `<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <item rdf:about="https://example.com/c">
+    <title>ミントチョコのアイスが復活</title>
+    <link>https://example.com/c</link>
+    <dc:date>2026-08-19T10:00:00+09:00</dc:date>
+  </item>
+</rdf:RDF>`
+
+const ATOM = `<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>チョコミントフラペチーノ発売</title>
+    <link rel="alternate" href="https://example.com/d"/>
+    <published>2026-08-20T01:00:00Z</published>
+  </entry>
+</feed>`
+
+test('RSS 2.0 を解釈できる', () => {
+  const items = parseFeed(RSS2)
+  assert.equal(items.length, 2)
+  assert.equal(items[0].title, 'チョコミント新商品が今夏も登場')
+  assert.equal(items[0].link, 'https://example.com/a')
+  assert.equal(items[0].thumbnailUrl, 'https://example.com/a.jpg')
+  assert.equal(items[0].publishedAt.toISOString(), '2026-08-18T02:00:00.000Z')
+})
+
+test('RDF (RSS 1.0) を解釈できる', () => {
+  const items = parseFeed(RDF)
+  assert.equal(items.length, 1)
+  assert.equal(items[0].title, 'ミントチョコのアイスが復活')
+  assert.equal(items[0].publishedAt.toISOString(), '2026-08-19T01:00:00.000Z')
+})
+
+test('Atom を解釈できる', () => {
+  const items = parseFeed(ATOM)
+  assert.equal(items.length, 1)
+  assert.equal(items[0].link, 'https://example.com/d')
+})
+
+test('日付が壊れていても落ちない', () => {
+  const items = parseFeed(`<rss><channel><item>
+    <title>チョコミント</title><link>https://example.com/e</link><pubDate>めちゃくちゃ</pubDate>
+  </item></channel></rss>`)
+  assert.equal(items.length, 1)
+  assert.ok(!Number.isNaN(items[0].publishedAt.getTime()))
+})
+
+test('タイトルかリンクが無い項目は捨てる', () => {
+  const items = parseFeed(`<rss><channel>
+    <item><title>タイトルだけ</title></item>
+    <item><link>https://example.com/f</link></item>
+  </channel></rss>`)
+  assert.equal(items.length, 0)
+})
+
+test('チョコミント関連だけを拾う', () => {
+  assert.ok(shouldCollect('チョコミントアイス'))
+  assert.ok(shouldCollect('ミントチョコクッキー'))
+  assert.ok(shouldCollect('チョコ・ミント のパフェ'), '区切り記号があっても拾う')
+  assert.ok(shouldCollect('Chocolate Mint Ice Cream'))
+  assert.ok(!shouldCollect('いちごミルク'))
+})
+
+test('食品でないものを除外する', () => {
+  assert.ok(!shouldCollect('チョコミント味 歯磨き粉'))
+  assert.ok(!shouldCollect('チョコミントの香り 入浴剤'))
+  assert.ok(!shouldCollect('チョコミント柄 iPhoneケース'))
+  assert.ok(!shouldCollect('ミントチョコ風味 プロテイン'))
+})
+
+test('商品名からカテゴリを推定する', () => {
+  assert.equal(guessCategory('チョコミントアイスバー'), 'ice')
+  assert.equal(guessCategory('チョコミントパフェ'), 'parfait')
+  assert.equal(guessCategory('チョコミントロールケーキ'), 'cake')
+  assert.equal(guessCategory('チョコミントラテ'), 'drink')
+  assert.equal(guessCategory('チョコミントメロンパン'), 'bread')
+  assert.equal(guessCategory('チョコミントクッキー'), 'snack')
+  assert.equal(guessCategory('チョコミントなにか'), 'other')
+})

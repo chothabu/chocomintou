@@ -1,0 +1,83 @@
+# XcodeGen 設定。`xcodegen generate` で ChocoMint.xcodeproj を生成する。
+# .xcodeproj は生成物なのでコミットしない（.gitignore 済み）。
+
+name: ChocoMint
+
+options:
+  bundleIdPrefix: app.chocomint
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    CLANG_ENABLE_MODULES: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+
+targets:
+  ChocoMint:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources
+    configFiles:
+      Debug: Config/Supabase.xcconfig
+      Release: Config/Supabase.xcconfig
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.chocomint
+        PRODUCT_NAME: ChocoMint
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Resources/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"          # iPhone のみ
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        # Sign in with Apple は有償の開発者アカウント（DEVELOPMENT_TEAM）が必要。
+        # 実機ビルドの際に Xcode の Signing & Capabilities でチームを設定する。
+        CODE_SIGN_ENTITLEMENTS: Resources/ChocoMint.entitlements
+
+  ChocoMintTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: ChocoMint
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.chocomint.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+  ChocoMintUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: ChocoMint
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.chocomint.uitests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  ChocoMint:
+    build:
+      targets:
+        ChocoMint: all
+        ChocoMintTests: [test]
+        ChocoMintUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ChocoMintTests
+        - ChocoMintUITests

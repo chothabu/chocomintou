@@ -1,0 +1,22 @@
+// Supabase の接続先。
+//
+// 空のままだと、アプリはサンプルデータで動く（README「バックエンドなしで動かす」参照）。
+// 値を入れると実際のバックエンドに接続する。
+//
+// 注意: xcconfig では "//" 以降がコメント扱いになるため、URL のスラッシュは
+// $(SLASH) を経由して書く必要がある。
+SLASH = /
+
+// --- ローカルの Supabase に接続する場合 ---
+// `npx supabase start` を実行してから、次の 2 行のコメントを外す。
+// SUPABASE_URL = http:$(SLASH)$(SLASH)127.0.0.1:54421
+// SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+
+// --- クラウドの Supabase に接続する場合 ---
+// SUPABASE_URL = https:$(SLASH)$(SLASH)xxxxxxxx.supabase.co
+// SUPABASE_ANON_KEY = <anon (public) key>
+//
+// service_role キーは絶対に書かないこと。
+
+SUPABASE_URL = http:$(SLASH)$(SLASH)127.0.0.1:54421
+SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0

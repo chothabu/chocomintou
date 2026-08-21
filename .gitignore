@@ -1,0 +1,26 @@
+# Xcode
+# .xcodeproj は XcodeGen の生成物（`xcodegen generate` で作る）
+ios/ChocoMint.xcodeproj/
+ios/*.xcworkspace
+ios/build/
+ios/DerivedData/
+.DS_Store
+xcuserdata/
+*.xcuserstate
+
+# Node / Next.js
+admin/node_modules/
+admin/.next/
+admin/out/
+admin/next-env.d.ts
+admin/.vercel/
+collectors/node_modules/
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# 環境変数（.env.example だけをコミットする）
+.env
+.env.local
+.env*.local

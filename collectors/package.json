@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "collect:news": "tsx src/news.ts",
-    "collect:products": "tsx src/rakuten.ts",
+    "collect:news": "tsx --env-file-if-exists=.env src/news.ts",
+    "collect:products": "tsx --env-file-if-exists=.env src/rakuten.ts",
+    "typecheck": "tsc --noEmit",
     "test": "tsx --test src/*.test.ts"
   },
   "dependencies": {

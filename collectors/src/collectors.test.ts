@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { parseFeed } from './feed.js'
-import { guessCategory, shouldCollect } from './keywords.js'
+import { dedupeKey, guessCategory, shouldCollect } from './keywords.js'
 
 const RSS2 = `<?xml version="1.0"?>
 <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
@@ -90,6 +90,35 @@ test('食品でないものを除外する', () => {
   assert.ok(!shouldCollect('チョコミントの香り 入浴剤'))
   assert.ok(!shouldCollect('チョコミント柄 iPhoneケース'))
   assert.ok(!shouldCollect('ミントチョコ風味 プロテイン'))
+})
+
+test('同じ商品の別出品をまとめる', () => {
+  // 実際に楽天から重複して取れたもの（片方に寸法が付いている）
+  assert.equal(
+    dedupeKey('無印良品 牛乳でつくる チョコミントラテ ・104g 84905629'),
+    dedupeKey('無印良品 牛乳でつくる チョコミントラテ ・104g 84905629 11.5 cm x 2.4 cm x 17.4 cm'),
+  )
+  // 販促文句・送料表記の違いを無視する
+  assert.equal(
+    dedupeKey('【送料無料】ロッテ チョコミントアイス 1L 冷凍'),
+    dedupeKey('ロッテ チョコミントアイス 1L'),
+  )
+  // 容量違いは同じ商品として扱う
+  assert.equal(
+    dedupeKey('赤城乳業 チョコミントバー 6本入'),
+    dedupeKey('赤城乳業 チョコミントバー 12本入'),
+  )
+})
+
+test('別の商品はまとめない', () => {
+  assert.notEqual(
+    dedupeKey('ロッテ チョコミントアイス'),
+    dedupeKey('赤城乳業 チョコミントアイス'),
+  )
+  assert.notEqual(
+    dedupeKey('チョコミントクッキー'),
+    dedupeKey('チョコミントケーキ'),
+  )
 })
 
 test('商品名からカテゴリを推定する', () => {

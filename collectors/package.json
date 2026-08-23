@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/*.test.ts",
     "prune": "tsx --env-file-if-exists=.env src/prune.ts",
-    "probe:hotpepper": "tsx --env-file-if-exists=.env src/hotpepper-probe.ts"
+    "probe:hotpepper": "tsx --env-file-if-exists=.env src/hotpepper-probe.ts",
+    "watch:brands": "tsx --env-file-if-exists=.env src/brandwatch.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

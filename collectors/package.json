@@ -8,7 +8,8 @@
     "collect:products": "tsx --env-file-if-exists=.env src/rakuten.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/*.test.ts",
-    "prune": "tsx --env-file-if-exists=.env src/prune.ts"
+    "prune": "tsx --env-file-if-exists=.env src/prune.ts",
+    "probe:hotpepper": "tsx --env-file-if-exists=.env src/hotpepper-probe.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

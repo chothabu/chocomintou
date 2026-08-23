@@ -18,13 +18,48 @@ import { dedupeKey, shouldCollect } from './keywords.js'
  *   npm run collect:prtimes -- --save  候補として登録
  */
 
-const KEYWORDS = ['チョコミント', 'ミントチョコ']
+/**
+ * キーワードページにページ送りは無く、1 語あたり 20 件が上限。
+ * 月別アーカイブも企業別の一覧も静的には取れなかった（2026-08-24 確認）。
+ * そこで語を増やして網を広げる。同じ発表が複数の語から拾えるので取りこぼしが減る
+ * （重複は URL で除く）。
+ *
+ * 語を足すときは、実際にチョコミント関連が返るか確かめてから入れること。
+ * 「チョコミントフェア」「チョコミント味」「ミントアイス」などは
+ * ページ自体は存在しても該当 0 件だった。
+ */
+const KEYWORDS = [
+  // 表記ゆれ
+  'チョコミント',
+  'ミントチョコ',
+  'チョコミン党',
+  'ミントチョコレート',
+  'チョコレートミント',
+  // 商品の形態
+  'チョコミントアイス',
+  'チョコミントパフェ',
+  'チョコミントドリンク',
+  'チョコミントケーキ',
+  'チョコミントフラペチーノ',
+  'チョコミントスイーツ',
+  'チョコミントシェイク',
+  // 周辺語（チョコミント以外も混ざるが shouldCollect で落とす）
+  'ミント',
+  'ペパーミント',
+  'ミントスイーツ',
+  'ミントグリーン',
+]
 
 type Release = {
   title: string
   url: string
   company: string | null
+  companyId: string | null
   publishedAt: Date | null
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function decode(text: string): string {
@@ -51,12 +86,14 @@ function parse(html: string): Release[] {
 
     const datetime = article.match(/<time[^>]*datetime="([^"]+)"/)?.[1]
     const company = article.match(/class="[^"]*company[^"]*"[^>]*>\s*([^<]{2,60})</)?.[1]
+    const companyId = article.match(/\/searchrlp\/company_id\/(\d+)/)?.[1]
     const published = datetime ? new Date(datetime) : null
 
     releases.push({
       title: decode(rawTitle).replace(/\s+/g, ' ').trim(),
       url: `https://prtimes.jp${href}`,
       company: company ? decode(company).trim() : null,
+      companyId: companyId ?? null,
       publishedAt: published && !Number.isNaN(published.getTime()) ? published : null,
     })
   }
@@ -86,7 +123,7 @@ async function main() {
     } catch (cause) {
       log(`「${keyword}」の取得に失敗: ${cause instanceof Error ? cause.message : String(cause)}`)
     }
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await sleep(1500)
   }
 
   const releases = [...collected.values()].sort(

@@ -218,9 +218,30 @@ struct ProductDetailView: View {
                         Text(channel)
                             .font(.subheadline)
                     }
+                    Divider()
                 }
 
-                Divider()
+                // 通販の取扱店。出品が実在することは確認できているので、
+                // 実店舗の目撃情報とは別枠で、事実として出す。
+                if let shop = product.onlineShopName, let url = product.officialUrl {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("通販で買える")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Link(destination: url) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "bag")
+                                    .font(.caption)
+                                Text(shop)
+                                    .font(.subheadline)
+                                    .lineLimit(1)
+                                Image(systemName: "arrow.up.right")
+                                    .font(.caption2)
+                            }
+                        }
+                    }
+                    Divider()
+                }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("近くで見つかっています")

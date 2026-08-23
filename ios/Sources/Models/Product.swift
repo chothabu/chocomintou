@@ -23,6 +23,8 @@ struct Product: Identifiable, Codable, Hashable, Sendable {
     /// メーカー公式告知に基づく表示用テキスト。実在店舗とは結合しない（例:「全国のファミリーマート」）。
     var salesChannelText: String?
     var officialUrl: URL?
+    /// 通販での取扱店名。`officialUrl` とセットで「どこで買える？」に出す。
+    var onlineShopName: String?
 
     // レビュー集計（DB トリガで更新される非正規化列）
     var reviewCount: Int

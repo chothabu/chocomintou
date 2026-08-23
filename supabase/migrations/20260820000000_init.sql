@@ -52,6 +52,10 @@ create table products (
 
   is_published       boolean not null default false,      -- 運営承認フラグ
 
+  -- 通販での取扱店。official_url とセットで「どこで買える？」に出す。
+  -- 実店舗の在庫とは無関係で、出品が実在するという検証済みの事実だけを表す。
+  online_shop_name   text,
+
   -- レビュー集計の非正規化。reviews のトリガで更新する（後述）。
   -- アプリは商品一覧を 1 クエリで取れる必要があるため、ビューではなく列として持つ。
   review_count       integer not null default 0,

@@ -30,7 +30,7 @@ enum SampleData {
             category: .ice, imageUrl: nil, price: 238,
             releaseDate: date(2026, 8, 20), endDate: date(2026, 9, 30),
             saleStatus: .onSale, isLimited: true,
-            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil,
+            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 126, avgOverall: 4.4, avgMint: 4.7, avgChocolate: 3.2,
             avgSweetness: 4.0, avgFreshness: 4.3, mintLevel: .lv5,
             createdAt: daysAgo(30), updatedAt: daysAgo(1)
@@ -41,7 +41,7 @@ enum SampleData {
             category: .snack, imageUrl: nil, price: 198,
             releaseDate: date(2026, 7, 15), endDate: nil,
             saleStatus: .onSale, isLimited: false,
-            salesChannelText: "全国のスーパー・コンビニ", officialUrl: nil,
+            salesChannelText: "全国のスーパー・コンビニ", officialUrl: nil, onlineShopName: nil,
             reviewCount: 84, avgOverall: 4.1, avgMint: 3.4, avgChocolate: 4.1,
             avgSweetness: 3.8, avgFreshness: 3.2, mintLevel: .lv4,
             createdAt: daysAgo(60), updatedAt: daysAgo(3)
@@ -52,7 +52,7 @@ enum SampleData {
             category: .parfait, imageUrl: nil, price: 780,
             releaseDate: date(2026, 6, 1), endDate: date(2026, 9, 15),
             saleStatus: .onSale, isLimited: true,
-            salesChannelText: "カフェ ミントリーフ 各店", officialUrl: nil,
+            salesChannelText: "カフェ ミントリーフ 各店", officialUrl: nil, onlineShopName: nil,
             reviewCount: 31, avgOverall: 4.6, avgMint: 3.9, avgChocolate: 4.4,
             avgSweetness: 4.2, avgFreshness: 4.0, mintLevel: .lv4,
             createdAt: daysAgo(90), updatedAt: daysAgo(5)
@@ -63,7 +63,7 @@ enum SampleData {
             category: .drink, imageUrl: nil, price: 460,
             releaseDate: date(2026, 8, 5), endDate: nil,
             saleStatus: .onSale, isLimited: false,
-            salesChannelText: "銀嶺珈琲 全店", officialUrl: nil,
+            salesChannelText: "銀嶺珈琲 全店", officialUrl: nil, onlineShopName: nil,
             reviewCount: 47, avgOverall: 3.8, avgMint: 2.6, avgChocolate: 3.9,
             avgSweetness: 4.4, avgFreshness: 2.8, mintLevel: .lv3,
             createdAt: daysAgo(20), updatedAt: daysAgo(2)
@@ -74,7 +74,7 @@ enum SampleData {
             category: .ice, imageUrl: nil, price: 168,
             releaseDate: date(2026, 5, 12), endDate: nil,
             saleStatus: .onSale, isLimited: false,
-            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil,
+            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 203, avgOverall: 4.2, avgMint: 4.2, avgChocolate: 3.6,
             avgSweetness: 3.5, avgFreshness: 4.1, mintLevel: .lv4,
             createdAt: daysAgo(120), updatedAt: daysAgo(1)
@@ -85,7 +85,7 @@ enum SampleData {
             category: .bread, imageUrl: nil, price: 210,
             releaseDate: date(2026, 8, 12), endDate: date(2026, 10, 31),
             saleStatus: .onSale, isLimited: true,
-            salesChannelText: "全国のスーパー", officialUrl: nil,
+            salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 12, avgOverall: 3.5, avgMint: 2.1, avgChocolate: 3.3,
             avgSweetness: 4.1, avgFreshness: 2.2, mintLevel: .lv2,
             createdAt: daysAgo(14), updatedAt: daysAgo(1)
@@ -96,7 +96,7 @@ enum SampleData {
             category: .cake, imageUrl: nil, price: 380,
             releaseDate: date(2026, 7, 28), endDate: nil,
             saleStatus: .onSale, isLimited: false,
-            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil,
+            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 58, avgOverall: 4.0, avgMint: 3.1, avgChocolate: 4.2,
             avgSweetness: 4.3, avgFreshness: 3.0, mintLevel: .lv3,
             createdAt: daysAgo(40), updatedAt: daysAgo(4)
@@ -107,7 +107,7 @@ enum SampleData {
             category: .ice, imageUrl: nil, price: 150,
             releaseDate: date(2025, 6, 10), endDate: date(2025, 9, 30),
             saleStatus: .ended, isLimited: true,
-            salesChannelText: "全国のスーパー", officialUrl: nil,
+            salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 96, avgOverall: 4.3, avgMint: 3.6, avgChocolate: 3.8,
             avgSweetness: 3.9, avgFreshness: 3.7, mintLevel: .lv4,
             createdAt: daysAgo(420), updatedAt: daysAgo(300)
@@ -118,7 +118,7 @@ enum SampleData {
             category: .ice, imageUrl: nil, price: 598,
             releaseDate: date(2025, 4, 1), endDate: nil,
             saleStatus: .onSale, isLimited: false,
-            salesChannelText: "全国のスーパー", officialUrl: nil,
+            salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 311, avgOverall: 4.5, avgMint: 3.8, avgChocolate: 4.5,
             avgSweetness: 3.6, avgFreshness: 3.9, mintLevel: .lv4,
             createdAt: daysAgo(500), updatedAt: daysAgo(2)
@@ -129,7 +129,7 @@ enum SampleData {
             category: .drink, imageUrl: nil, price: 180,
             releaseDate: date(2026, 9, 1), endDate: nil,
             saleStatus: .upcoming, isLimited: true,
-            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil,
+            salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 0, avgOverall: nil, avgMint: nil, avgChocolate: nil,
             avgSweetness: nil, avgFreshness: nil, mintLevel: nil,
             createdAt: daysAgo(5), updatedAt: daysAgo(5)

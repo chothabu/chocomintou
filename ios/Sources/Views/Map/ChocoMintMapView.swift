@@ -75,6 +75,16 @@ struct ChocoMintMapView: View {
     private var map: some View {
         Map(position: $camera, selection: selectionBinding) {
             UserAnnotation()
+
+            // 目撃情報がまだ無い周辺のお店。報告先として選べるようにするためのもので、
+            // 在庫の主張ではない。目撃ピンと取り違えられないよう小さく薄く出す。
+            ForEach(model.reportableStores) { (store: StoreCandidate) in
+                Annotation(store.name, coordinate: store.coordinate) {
+                    reportableView(store)
+                }
+                .annotationTitles(.hidden)
+            }
+
             ForEach(model.pins) { (pin: StorePin) in
                 Annotation(pin.storeName, coordinate: pin.coordinate) {
                     pinView(pin)
@@ -114,9 +124,27 @@ struct ChocoMintMapView: View {
         .animation(.spring(duration: 0.2), value: model.selectedPin?.storeId)
     }
 
+    /// 目撃情報が無いお店。中身のない小さな丸にして、目撃ピンと明確に差をつける。
+    private func reportableView(_ store: StoreCandidate) -> some View {
+        Button {
+            model.selectedReportable = store
+        } label: {
+            Circle()
+                .fill(Color(.systemBackground))
+                .overlay(Circle().stroke(Palette.mint.opacity(0.7), lineWidth: 2))
+                .frame(width: 13, height: 13)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(store.name)。目撃情報はまだありません")
+    }
+
     @ViewBuilder
     private var bottomBar: some View {
         VStack(spacing: 10) {
+            if let store = model.selectedReportable {
+                reportableCard(store)
+            }
             if let pin = model.selectedPin {
                 storeCard(pin)
             }
@@ -137,15 +165,54 @@ struct ChocoMintMapView: View {
                 if model.isLoading {
                     ProgressView().controlSize(.small)
                 } else {
-                    Text("\(model.pins.count)店舗")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        model.reportableStores.isEmpty
+                            ? "\(model.pins.count)店舗"
+                            : "目撃 \(model.pins.count) / 周辺 \(model.reportableStores.count)"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(.regularMaterial)
         }
+    }
+
+    /// 目撃情報が無いお店を選んだときのカード。
+    /// 在庫があるとは言わず、報告を促すだけにする。
+    private func reportableCard(_ store: StoreCandidate) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(store.name)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                if let distance = store.distance {
+                    Text(Formatters.distance(distance))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Text("このお店の目撃情報はまだありません。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text("チョコミントを見つけたら、商品ページの「この商品を見つけた」から報告できます。")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+
+            HStack {
+                Spacer()
+                Button("閉じる") { model.selectedReportable = nil }
+                    .font(.caption)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Metrics.cardCorner))
+        .padding(.horizontal, 12)
     }
 
     /// ピンをタップしたときのカード（設計 §17）。

@@ -287,7 +287,8 @@ struct ProductDetailView: View {
                 if let url = product.officialUrl {
                     Link(destination: url) {
                         HStack {
-                            Text("公式サイト")
+                            // メーカー公式とは限らず、通販の商品ページのこともある。
+                            Text("商品ページ")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             Spacer()

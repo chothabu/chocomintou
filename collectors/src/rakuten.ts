@@ -13,9 +13,22 @@ import { dedupeKey, guessCategory, shouldCollect } from './keywords.js'
 // 認証はアプリ ID とアクセスキーの 2 つが要る。
 // 旧ホスト（app.rakuten.co.jp/services/api/...）はアクセスキーを受け付けない。
 const ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701'
-const KEYWORDS = ['チョコミント', 'ミントチョコ']
+
+// 「チョコミント」だけだとアイスに偏るので、商品の形態ごとに引く。
+const KEYWORDS = [
+  'チョコミント',
+  'ミントチョコ',
+  'チョコミント アイス',
+  'チョコミント クッキー',
+  'チョコミント チョコレート',
+  'チョコミント ケーキ',
+  'チョコミント ドリンク',
+  'チョコミント パン',
+  'ミントチョコ 菓子',
+]
+
 const HITS_PER_PAGE = 30
-const MAX_PAGES = 3
+const MAX_PAGES = 4
 
 type RakutenItem = {
   itemCode: string
@@ -37,15 +50,17 @@ async function search(
   credentials: Credentials,
   keyword: string,
   page: number,
+  attempt = 1,
 ): Promise<RakutenItem[]> {
   const url = new URL(ENDPOINT)
   url.searchParams.set('applicationId', credentials.applicationId)
   url.searchParams.set('keyword', keyword)
   url.searchParams.set('hits', String(HITS_PER_PAGE))
   url.searchParams.set('page', String(page))
-  // 食品ジャンルに寄せる（雑貨・日用品のノイズを減らす）
-  url.searchParams.set('genreId', '100227')
   url.searchParams.set('formatVersion', '2')
+  // ジャンルでは絞らない。チョコミント商品は菓子・アイス・ふるさと納税などに
+  // 散らばっており、1 つのジャンルに寄せると大半を取りこぼす（実測 5982 件 → 15 件）。
+  // 食品以外の除外は shouldCollect() のノイズ判定で行う。
   if (credentials.affiliateId) {
     url.searchParams.set('affiliateId', credentials.affiliateId)
   }
@@ -64,12 +79,28 @@ async function search(
         `現在の送信元 IP は \`curl -s https://api.ipify.org\` で確認できます。`,
     )
   }
+
+  // 楽天は短時間の連続アクセスを絞る。少し待てば通るので、諦める前に retry する。
+  if (response.status === 429 || response.status === 503) {
+    if (attempt >= 3) {
+      throw new Error(`楽天 API が ${response.status} を返し続けています。時間をおいて再実行してください。`)
+    }
+    const waitMs = 3000 * attempt
+    log(`  混雑のため ${waitMs / 1000} 秒待って再試行します（${response.status}）`)
+    await sleep(waitMs)
+    return search(credentials, keyword, page, attempt + 1)
+  }
+
   if (!response.ok) {
     throw new Error(`楽天 API が ${response.status} を返しました: ${await response.text()}`)
   }
 
   const json = (await response.json()) as { Items?: RakutenItem[] }
   return json.Items ?? []
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /** 画像 URL は形式が版によって変わるため、どちらでも読めるようにする。 */
@@ -110,7 +141,16 @@ async function main() {
 
   for (const keyword of KEYWORDS) {
     for (let page = 1; page <= MAX_PAGES; page += 1) {
-      const items = await search(credentials, keyword, page)
+      let items: RakutenItem[]
+      try {
+        items = await search(credentials, keyword, page)
+      } catch (cause) {
+        // 1 ページ失敗しても、集まった分は残したいので次のキーワードへ進む
+        log(`  「${keyword}」${page}ページ目を取得できませんでした: ${
+          cause instanceof Error ? cause.message : String(cause)
+        }`)
+        break
+      }
       if (items.length === 0) break
 
       for (const item of items) {
@@ -157,7 +197,7 @@ async function main() {
       }
 
       // 連続アクセスを避ける
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await sleep(1200)
     }
   }
 

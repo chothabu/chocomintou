@@ -92,6 +92,26 @@ test('食品でないものを除外する', () => {
   assert.ok(!shouldCollect('ミントチョコ風味 プロテイン'))
 })
 
+// 実際に楽天から混ざってきたもの。「チョコミント」は
+// 作者名・柄の名前・のぼりの文言としても使われる。
+test('食品でない物販や書籍を除外する', () => {
+  assert.ok(!shouldCollect('鬼畜極道、ヤバすぎる溺愛。 第48話 【電子書籍】[ チョコミント ]'))
+  assert.ok(!shouldCollect('のぼり旗 チョコミントカステラ・レトロ風のぼり'))
+  assert.ok(!shouldCollect('翠銅鉱チョコミントケーキ PUレザーハンドバッグ ユニセックス'))
+  assert.ok(!shouldCollect('ラネージュ リップスリーピングマスク チョコミント'))
+})
+
+test('製菓材料は除外する（完成した商品ではない）', () => {
+  assert.ok(!shouldCollect('フレッシュミント FDパウダー（スイーツ・ドリンク・チョコミント）'))
+})
+
+test('ふつうの商品は除外しない', () => {
+  assert.ok(shouldCollect('ロッテ 小さなアイス屋さん チョコミント 1L'))
+  assert.ok(shouldCollect('赤城乳業 セルフチョコレートクラッシュ チョコミント'))
+  assert.ok(shouldCollect('北海道銘菓 雪花青 チョコミント ホワイトチョコクッキー'))
+  assert.ok(shouldCollect('チョコミントバー 1袋6本入 あいす おやつ 夏 冷凍'))
+})
+
 test('同じ商品の別出品をまとめる', () => {
   // 実際に楽天から重複して取れたもの（片方に寸法が付いている）
   assert.equal(

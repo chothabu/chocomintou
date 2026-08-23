@@ -7,7 +7,8 @@
     "collect:news": "tsx --env-file-if-exists=.env src/news.ts",
     "collect:products": "tsx --env-file-if-exists=.env src/rakuten.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/*.test.ts"
+    "test": "tsx --test src/*.test.ts",
+    "prune": "tsx --env-file-if-exists=.env src/prune.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

@@ -1,0 +1,73 @@
+name: 収集バッチ
+
+# ニュースは毎日、公式サイトとプレスリリースは週 1 回。
+# 公式サイトは更新頻度が低く、相手のサーバーに負担をかけたくないため（設計 §外部データ源の調査）。
+#
+# サーバーレス関数の定期実行ではなく GitHub Actions を使う理由:
+# ブランド巡回は 85 サイト × 最大 12 ページを 1.2 秒間隔で回るため 20 分以上かかり、
+# 関数の実行時間上限に収まらない。
+on:
+  schedule:
+    # 毎日 06:00 JST（UTC 21:00）
+    - cron: '0 21 * * *'
+    # 毎週月曜 07:00 JST（UTC 日曜 22:00）
+    - cron: '0 22 * * 0'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: '手動実行する収集'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, news, products, prtimes, brands]
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: collectors/package-lock.json
+
+      - run: npm ci
+        working-directory: collectors
+
+      - name: ニュース収集（毎日）
+        if: github.event.schedule == '0 21 * * *' || inputs.job == 'all' || inputs.job == 'news'
+        working-directory: collectors
+        run: npm run collect:news
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: プレスリリース収集（週次）
+        if: github.event.schedule == '0 22 * * 0' || inputs.job == 'all' || inputs.job == 'prtimes'
+        working-directory: collectors
+        run: npm run collect:prtimes -- --save
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: ブランド公式サイト巡回（週次）
+        if: github.event.schedule == '0 22 * * 0' || inputs.job == 'all' || inputs.job == 'brands'
+        working-directory: collectors
+        run: npm run watch:brands -- --save
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: 楽天の商品候補収集（週次）
+        # 楽天は送信元 IP を登録する必要がある。GitHub Actions の IP は固定できないため、
+        # Application type を Web にするか、固定 IP を持つ環境で実行すること。
+        if: inputs.job == 'products'
+        working-directory: collectors
+        run: npm run collect:products
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}

@@ -37,11 +37,21 @@ docs/        設計書
 cd collectors
 cp .env.example .env    # 値を埋める
 npm install
-
-npm run collect:news                 # ニュース記事を収集
-npm run collect:news -- --dry-run    # 保存せず結果だけ確認
-npm run collect:products             # 楽天から商品候補を収集
 ```
+
+| コマンド | 何を集めるか | 頻度 |
+|---|---|---|
+| `npm run collect:news` | ニュース記事（登録した RSS から） | 毎日 |
+| `npm run collect:products` | 楽天の市販品・通販の取扱店 | 週次 |
+| `npm run collect:prtimes` | **チョコミントを出した実績のある店**（プレスリリース） | 週次 |
+| `npm run watch:brands` | チェーン公式サイトの取扱商品（85 ブランド） | 週次 |
+| `npm run prune` | 収集済み候補に現在のフィルタをかけ直す | 随時 |
+
+`--save` を付けると候補として登録し、付けなければ結果を表示するだけです。
+`watch:brands` は `--brand 明治` で 1 社だけ試せます。
+
+定期実行は [`.github/workflows/collect.yml`](.github/workflows/collect.yml) にあります。
+Supabase をクラウドに移し、リポジトリの Secrets に接続情報を入れると動きます。
 
 収集した商品候補は公開されない。管理画面の「商品候補」で内容を確認し、承認 → 公開したものだけが
 アプリに出る（設計 §26 / §28）。承認時に商品画像と商品ページの URL も引き継がれる。

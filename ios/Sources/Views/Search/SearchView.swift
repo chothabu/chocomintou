@@ -162,9 +162,11 @@ struct SearchView: View {
                             .lineLimit(2)
                         HStack(spacing: 8) {
                             FreshnessBadge(freshness: pin.freshness)
-                            Text(Formatters.distance(pin.distanceM))
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(.secondary)
+                            if let distance = pin.distanceM {
+                                Text(Formatters.distance(distance))
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                     .padding(.vertical, 2)
@@ -176,8 +178,8 @@ struct SearchView: View {
             if model.stores.isEmpty && model.hasSearched {
                 EmptyStateView(
                     symbol: "storefront",
-                    title: "近くに目撃情報のあるお店がありません",
-                    message: "チョコミントを見つけたら報告してください。"
+                    title: "目撃情報のあるお店がまだありません",
+                    message: "チョコミントを見つけたら、商品ページの「この商品を見つけた」から報告してください。最初の 1 件が地図を作ります。"
                 )
             }
         }

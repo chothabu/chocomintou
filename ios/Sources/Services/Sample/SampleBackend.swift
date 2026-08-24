@@ -110,7 +110,43 @@ actor SampleBackend: ProductServing, StoreServing, SightingServing, ReviewServin
                 ))
             }
         }
-        return rows.sorted { $0.distanceM < $1.distanceM }
+        return rows.sorted { ($0.distanceM ?? 0) < ($1.distanceM ?? 0) }
+    }
+
+    func recentlySeen(
+        coordinate: CLLocationCoordinate2D?,
+        limit: Int
+    ) async throws -> [NearbyStoreProduct] {
+        let origin = coordinate.map { CLLocation(latitude: $0.latitude, longitude: $0.longitude) }
+        var rows: [NearbyStoreProduct] = []
+
+        for (storeId, productIds) in storeProductIndex() {
+            guard let store = stores.first(where: { $0.id == storeId }) else { continue }
+            for pid in productIds {
+                guard let product = products.first(where: { $0.id == pid }),
+                      product.saleStatus != .ended,
+                      let lastSeen = lastSeenAt(storeId: storeId, productId: pid)
+                else { continue }
+                let freshness = SightingFreshness.from(lastSeenAt: lastSeen)
+                guard freshness.isVisible else { continue }
+                rows.append(NearbyStoreProduct(
+                    storeId: store.id,
+                    storeName: store.name,
+                    chainName: store.chainName,
+                    latitude: store.latitude,
+                    longitude: store.longitude,
+                    distanceM: origin.map {
+                        CLLocation(latitude: store.latitude, longitude: store.longitude).distance(from: $0)
+                    },
+                    productId: product.id,
+                    productName: product.name,
+                    imageUrl: product.imageUrl,
+                    lastSeenAt: lastSeen,
+                    freshness: freshness
+                ))
+            }
+        }
+        return rows.sorted { $0.lastSeenAt > $1.lastSeenAt }.prefix(limit).map { $0 }
     }
 
     func store(id: UUID) async throws -> Store? {

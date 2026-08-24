@@ -223,9 +223,11 @@ struct ChocoMintMapView: View {
                     Text(pin.storeName)
                         .font(.subheadline.weight(.semibold))
                     Spacer()
-                    Text(Formatters.distance(pin.distanceM))
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                    if let distance = pin.distanceM {
+                        Text(Formatters.distance(distance))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 ForEach(pin.items.prefix(3)) { item in

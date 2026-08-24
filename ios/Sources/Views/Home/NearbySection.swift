@@ -67,7 +67,7 @@ struct NearbySection: View {
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: 4) {
-                Text(Formatters.distance(item.distanceM))
+                Text(item.distanceM.map(Formatters.distance) ?? "")
                     .font(.footnote.weight(.medium).monospacedDigit())
                 Image(systemName: "chevron.right")
                     .font(.caption)

@@ -261,9 +261,11 @@ struct ProductDetailView: View {
                                         .font(.subheadline)
                                         .lineLimit(1)
                                     Spacer(minLength: 4)
-                                    Text(Formatters.distance(item.distanceM))
-                                        .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.secondary)
+                                    if let distance = item.distanceM {
+                                        Text(Formatters.distance(distance))
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.secondary)
+                                    }
                                     Text(Formatters.sightingTime(item.lastSeenAt))
                                         .font(.caption2)
                                         .foregroundStyle(.tertiary)

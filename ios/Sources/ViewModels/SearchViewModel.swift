@@ -50,18 +50,19 @@ final class SearchViewModel {
                     filter: filter, limit: Self.pageSize, offset: 0
                 )
             case .stores:
-                guard let coordinate else {
-                    stores = []
-                    errorMessage = "店舗を探すには位置情報の許可が必要です。"
-                    return
-                }
-                let rows = try await services.stores.nearby(
-                    coordinate: coordinate, radiusMeters: 5000, productId: nil, onSaleOnly: false
+                // 距離では絞らない。目撃情報のある店は全国どこでも一覧する
+                // （現在地が分かれば距離を添えて近い順に並べ替える）。
+                let rows = try await services.stores.recentlySeen(
+                    coordinate: coordinate, limit: Self.pageSize
                 )
                 let keyword = filter.keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+                // 店名でも商品名でも引けるようにする
                 let matched = keyword.isEmpty
                     ? rows
-                    : rows.filter { $0.storeName.localizedCaseInsensitiveContains(keyword) }
+                    : rows.filter {
+                        $0.storeName.localizedCaseInsensitiveContains(keyword)
+                            || $0.productName.localizedCaseInsensitiveContains(keyword)
+                    }
                 stores = StorePin.group(matched)
             }
         } catch {

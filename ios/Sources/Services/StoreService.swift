@@ -27,6 +27,49 @@ struct SupabaseStoreService: StoreServing {
         )
     }
 
+    /// 距離で絞らず、最近見つかった順に返す。
+    /// `stores_nearby` は半径で絞るため、全国を一覧するにはこちらを使う。
+    func recentlySeen(
+        coordinate: CLLocationCoordinate2D?,
+        limit: Int
+    ) async throws -> [NearbyStoreProduct] {
+        let cutoff = PostgresDate.iso8601.string(from: Date().addingTimeInterval(-60 * 60 * 24 * 30))
+        let query = PostgRESTQuery("store_products")
+            .select("last_seen_at,store:stores(\(Self.storeColumns)),product:products(*)")
+            .gte("last_seen_at", cutoff)
+            .appending(URLQueryItem(name: "order", value: "last_seen_at.desc"))
+            .limit(limit)
+
+        let rows = try await client.fetch(query, as: [SeenRow].self)
+        return rows.compactMap { row in
+            // 未公開の商品は RLS で除外され、埋め込みが null になる
+            guard let store = row.store, let product = row.product else { return nil }
+            guard product.saleStatus != .ended else { return nil }
+            let freshness = SightingFreshness.from(lastSeenAt: row.lastSeenAt)
+            guard freshness.isVisible else { return nil }
+            return NearbyStoreProduct(
+                storeId: store.id,
+                storeName: store.name,
+                chainName: store.chainName,
+                latitude: store.latitude,
+                longitude: store.longitude,
+                distanceM: coordinate.map { store.distance(from: $0) },
+                productId: product.id,
+                productName: product.name,
+                imageUrl: product.imageUrl,
+                lastSeenAt: row.lastSeenAt,
+                freshness: freshness
+            )
+        }
+    }
+
+    /// `store_products` に店舗と商品を埋め込んだ行。
+    private struct SeenRow: Decodable, Sendable {
+        let lastSeenAt: Date
+        let store: Store?
+        let product: Product?
+    }
+
     func store(id: UUID) async throws -> Store? {
         try await client.fetchOne(
             PostgRESTQuery("stores").select(Self.storeColumns).eq("id", id),

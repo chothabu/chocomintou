@@ -64,7 +64,8 @@ struct NearbyStoreProduct: Identifiable, Codable, Hashable, Sendable {
     var chainName: ChainName?
     var latitude: Double
     var longitude: Double
-    var distanceM: Double
+    /// 現在地が分からないときは nil。距離を出さずに一覧するために任意にしている。
+    var distanceM: Double?
     var productId: UUID
     var productName: String
     var imageUrl: URL?
@@ -85,7 +86,7 @@ struct StorePin: Identifiable, Hashable, Sendable {
     var chainName: ChainName?
     var latitude: Double
     var longitude: Double
-    var distanceM: Double
+    var distanceM: Double?
     var items: [NearbyStoreProduct]
 
     var id: UUID { storeId }
@@ -123,6 +124,17 @@ struct StorePin: Identifiable, Hashable, Sendable {
                 items: items.sorted { $0.lastSeenAt > $1.lastSeenAt }
             )
         }
-        .sorted { $0.distanceM < $1.distanceM }
+        // 距離が分かるものを先に、近い順。分からなければ最終目撃が新しい順。
+        .sorted { left, right in
+            switch (left.distanceM, right.distanceM) {
+            case let (l?, r?): return l < r
+            case (nil, _?): return false
+            case (_?, nil): return true
+            default:
+                let l = left.items.map(\.lastSeenAt).max() ?? .distantPast
+                let r = right.items.map(\.lastSeenAt).max() ?? .distantPast
+                return l > r
+            }
+        }
     }
 }

@@ -22,6 +22,13 @@ protocol StoreServing: Sendable {
         productId: UUID?,
         onSaleOnly: Bool
     ) async throws -> [NearbyStoreProduct]
+    /// 目撃実績のある店舗を、距離で絞らずに新しい順で返す。
+    /// 現在地が分かれば距離も入れる（分からなければ nil）。
+    func recentlySeen(
+        coordinate: CLLocationCoordinate2D?,
+        limit: Int
+    ) async throws -> [NearbyStoreProduct]
+
     func store(id: UUID) async throws -> Store?
     /// この店舗で見つかった商品。鮮度 30 日以内のみ。
     func products(atStore storeId: UUID) async throws -> [StoreProductEntry]

@@ -149,6 +149,20 @@ actor SampleBackend: ProductServing, StoreServing, SightingServing, ReviewServin
         return rows.sorted { $0.lastSeenAt > $1.lastSeenAt }.prefix(limit).map { $0 }
     }
 
+    func chainOfferings() async throws -> [ChainOffering] {
+        var grouped: [String: [Product]] = [:]
+        for (productId, chains) in SampleData.channels {
+            guard let product = products.first(where: { $0.id == productId }),
+                  product.saleStatus != .ended else { continue }
+            for chain in chains {
+                grouped[chain.displayName, default: []].append(product)
+            }
+        }
+        return grouped
+            .map { ChainOffering(chainName: $0.key, products: $0.value) }
+            .sorted { $0.chainName < $1.chainName }
+    }
+
     func store(id: UUID) async throws -> Store? {
         stores.first { $0.id == id }
     }

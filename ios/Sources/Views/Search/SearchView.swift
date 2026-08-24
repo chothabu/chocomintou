@@ -151,7 +151,65 @@ struct SearchView: View {
 
     private var storeList: some View {
         List {
-            ForEach(model.stores) { pin in
+            if !model.stores.isEmpty {
+                Section("チョコミントが見つかったお店") { sightedRows }
+            } else {
+                sightedRows
+            }
+
+            if !model.chainStores.isEmpty {
+                Section {
+                    ForEach(model.chainStores) { store in
+                        chainStoreRow(store)
+                    }
+                } header: {
+                    Text("近くの取り扱いチェーン")
+                } footer: {
+                    Text("公式サイトでチェーンでの取り扱いを確認したお店です。その店に在庫があるかは分かりません。見つけたら報告してください。")
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .overlay {
+            if model.stores.isEmpty && model.chainStores.isEmpty && model.hasSearched {
+                EmptyStateView(
+                    symbol: "storefront",
+                    title: "目撃情報のあるお店がまだありません",
+                    message: "チョコミントを見つけたら、商品ページの「この商品を見つけた」から報告してください。最初の 1 件が地図を作ります。"
+                )
+            }
+        }
+    }
+
+    /// 取り扱いチェーンの店舗。目撃情報と取り違えられないよう、
+    /// 鮮度バッジは出さず「チェーンで取り扱い」と明示する。
+    private func chainStoreRow(_ store: ChainStore) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(store.candidate.name)
+                .font(.subheadline.weight(.semibold))
+            Text(store.offering.products.map(\.name).joined(separator: "、"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+            HStack(spacing: 8) {
+                Text("チェーンで取り扱い")
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Palette.paleMint, in: Capsule())
+                    .foregroundStyle(Palette.deepMint)
+                if let distance = store.candidate.distance {
+                    Text(Formatters.distance(distance))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 2)
+    }
+
+    private var sightedRows: some View {
+        ForEach(model.stores) { pin in
                 NavigationLink(value: AppRoute.store(pin.storeId)) {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(pin.storeName)
@@ -172,17 +230,6 @@ struct SearchView: View {
                     .padding(.vertical, 2)
                 }
             }
-        }
-        .listStyle(.insetGrouped)
-        .overlay {
-            if model.stores.isEmpty && model.hasSearched {
-                EmptyStateView(
-                    symbol: "storefront",
-                    title: "目撃情報のあるお店がまだありません",
-                    message: "チョコミントを見つけたら、商品ページの「この商品を見つけた」から報告してください。最初の 1 件が地図を作ります。"
-                )
-            }
-        }
     }
 
     private func runSearch() {

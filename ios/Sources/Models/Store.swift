@@ -138,3 +138,23 @@ struct StorePin: Identifiable, Hashable, Sendable {
         }
     }
 }
+
+
+/// 公式サイトで取り扱いを確認できたチェーンと、その商品。
+///
+/// 「そのチェーンに行けば買える」という**チェーン単位の事実**であって、
+/// 個々の店舗に在庫があることの保証ではない。目撃情報とは別物として扱う。
+struct ChainOffering: Identifiable, Hashable, Sendable {
+    var chainName: String
+    var products: [Product]
+
+    var id: String { chainName }
+}
+
+/// 近くにある、取り扱いチェーンの店舗。
+struct ChainStore: Identifiable, Hashable, Sendable {
+    var candidate: StoreCandidate
+    var offering: ChainOffering
+
+    var id: String { candidate.id }
+}

@@ -29,6 +29,9 @@ protocol StoreServing: Sendable {
         limit: Int
     ) async throws -> [NearbyStoreProduct]
 
+    /// 公式サイトで取り扱いを確認できたチェーンと、その商品。
+    func chainOfferings() async throws -> [ChainOffering]
+
     func store(id: UUID) async throws -> Store?
     /// この店舗で見つかった商品。鮮度 30 日以内のみ。
     func products(atStore storeId: UUID) async throws -> [StoreProductEntry]

@@ -70,6 +70,28 @@ struct SupabaseStoreService: StoreServing {
         let product: Product?
     }
 
+    /// 取り扱いチェーンと、そのチェーンで売っている商品。
+    func chainOfferings() async throws -> [ChainOffering] {
+        let query = PostgRESTQuery("product_channels")
+            .select("chain_name,product:products(*)")
+        let rows = try await client.fetch(query, as: [ChannelRow].self)
+
+        var grouped: [String: [Product]] = [:]
+        for row in rows {
+            // 未公開の商品は RLS で除外され、埋め込みが null になる
+            guard let product = row.product, product.saleStatus != .ended else { continue }
+            grouped[row.chainName, default: []].append(product)
+        }
+        return grouped
+            .map { ChainOffering(chainName: $0.key, products: $0.value) }
+            .sorted { $0.chainName < $1.chainName }
+    }
+
+    private struct ChannelRow: Decodable, Sendable {
+        let chainName: String
+        let product: Product?
+    }
+
     func store(id: UUID) async throws -> Store? {
         try await client.fetchOne(
             PostgRESTQuery("stores").select(Self.storeColumns).eq("id", id),

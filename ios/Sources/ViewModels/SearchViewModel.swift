@@ -20,12 +20,15 @@ final class SearchViewModel {
     var filter = ProductFilter()
     var products: [Product] = []
     var stores: [StorePin] = []
+    /// 近くにある、取り扱いチェーンの店舗。目撃情報とは別枠で出す。
+    var chainStores: [ChainStore] = []
     var isLoading = false
     var errorMessage: String?
     /// 検索したが 0 件だった状態。初期表示と区別する。
     var hasSearched = false
 
     private var searchTask: Task<Void, Never>?
+    private let storeSearch = StoreSearchService()
     private static let pageSize = 40
 
     /// 入力のたびに投げると通信が増えるので、少し待ってからまとめて実行する。
@@ -64,9 +67,61 @@ final class SearchViewModel {
                             || $0.productName.localizedCaseInsensitiveContains(keyword)
                     }
                 stores = StorePin.group(matched)
+                await loadChainStores(services: services, coordinate: coordinate, keyword: keyword)
             }
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? "検索に失敗しました。"
         }
+    }
+
+    /// 近くの店舗のうち、公式サイトで取り扱いを確認できたチェーンのものを拾う。
+    ///
+    /// 「そのチェーンで売っている」という事実と「その店に今ある」は別なので、
+    /// 目撃情報の一覧とは混ぜずに分けて持つ。
+    private func loadChainStores(
+        services: AppServices,
+        coordinate: CLLocationCoordinate2D?,
+        keyword: String
+    ) async {
+        guard let coordinate else {
+            chainStores = []
+            return
+        }
+        guard let offerings = try? await services.stores.chainOfferings(), !offerings.isEmpty else {
+            chainStores = []
+            return
+        }
+        let nearby = (try? await storeSearch.nearbyStores(around: coordinate, radiusMeters: 3000)) ?? []
+
+        // 目撃情報として既に出ている店舗は重複させない
+        let alreadyListed = Set(stores.map(\.storeName))
+
+        var matched: [ChainStore] = []
+        for candidate in nearby where !alreadyListed.contains(candidate.name) {
+            guard let offering = offerings.first(where: { Self.matches(candidate.name, chain: $0.chainName) })
+            else { continue }
+            if !keyword.isEmpty {
+                let hit = candidate.name.localizedCaseInsensitiveContains(keyword)
+                    || offering.products.contains { $0.name.localizedCaseInsensitiveContains(keyword) }
+                guard hit else { continue }
+            }
+            matched.append(ChainStore(candidate: candidate, offering: offering))
+        }
+        chainStores = matched
+    }
+
+    /// 店名がそのチェーンのものか。
+    ///
+    /// 地図から返る店名は「ローソン 渋谷○○店」のように支店名が付くので、
+    /// チェーン名を含むかで判定する。表記ゆれを吸収するため空白と中黒は落とす。
+    static func matches(_ storeName: String, chain: String) -> Bool {
+        func normalize(_ text: String) -> String {
+            text.replacingOccurrences(of: " ", with: "")
+                .replacingOccurrences(of: "　", with: "")
+                .replacingOccurrences(of: "・", with: "")
+                .replacingOccurrences(of: "-", with: "")
+                .lowercased()
+        }
+        return normalize(storeName).contains(normalize(chain))
     }
 }

@@ -137,6 +137,7 @@ async function main() {
     .from('product_submissions')
     .select('name')
     .eq('source', 'rakuten')
+  // 楽天の出品はメーカー名が取れないので、商品名だけで突き合わせる
   for (const row of existing ?? []) seenNames.add(dedupeKey(row.name))
 
   for (const keyword of KEYWORDS) {

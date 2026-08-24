@@ -123,4 +123,56 @@ export const BRANDS: Brand[] = [
   { name: 'ビアードパパ', domain: 'www.beardpapa.jp' },
   { name: 'PABLO', domain: 'www.pablo3.com' },
   { name: 'ロールアイスクリームファクトリー', domain: 'rollicecreamfactory.com' },
+
+  // ---- 地方チェーン ----
+  // 北海道
+  { name: '六花亭', domain: 'www.rokkatei.co.jp' },
+  { name: '柳月', domain: 'www.ryugetsu.co.jp' },
+  { name: 'きのとや', domain: 'www.kinotoya.com' },
+  { name: '北菓楼', domain: 'www.kitakaro.com' },
+  { name: 'ラッキーピエロ', domain: 'luckypierrot.jp' },
+  // 東北
+  { name: '菓匠三全', domain: 'www.sanzen.co.jp' },
+  { name: 'ヨークベニマル', domain: 'www.yorkbenimaru.com' },
+  // 関東
+  { name: 'ベルク', domain: 'www.belc.jp' },
+  { name: 'カスミ', domain: 'www.kasumi.co.jp' },
+  { name: 'いなげや', domain: 'www.inageya.co.jp' },
+  { name: 'ロピア', domain: 'www.lopia.jp' },
+  { name: '崎陽軒', domain: 'kiyoken.com' },
+  { name: '舟和', domain: 'funawa.jp' },
+  { name: 'ポンパドウル', domain: 'www.pompadour.co.jp' },
+  { name: '木村屋總本店', domain: 'www.kimuraya-sohonten.co.jp' },
+  // 中部
+  { name: '平和堂', domain: 'www.heiwado.jp' },
+  { name: '春華堂', domain: 'www.shunkado.co.jp' },
+  { name: 'バロー', domain: 'www.valor.co.jp' },
+  // 関西
+  { name: '万代', domain: 'www.mandai-net.co.jp' },
+  { name: '関西スーパー', domain: 'www.kansaisuper.co.jp' },
+  { name: '551蓬莱', domain: 'www.551horai.co.jp' },
+  { name: '進々堂', domain: 'www.shinshindo.jp' },
+  { name: 'マールブランシュ', domain: 'www.malebranche.co.jp' },
+  { name: 'モロゾフ', domain: 'www.morozoff.co.jp' },
+  { name: 'ゴンチャロフ', domain: 'www.goncharoff.co.jp' },
+  { name: 'ユーハイム', domain: 'www.juchheim.co.jp' },
+  { name: 'アンリ・シャルパンティエ', domain: 'www.henri-charpentier.com' },
+  // 中国四国
+  { name: 'ハローズ', domain: 'www.halows.com' },
+  { name: 'フジ', domain: 'www.fuji.co.jp' },
+  { name: 'イズミ（ゆめタウン）', domain: 'www.izumi.co.jp' },
+  { name: '八天堂', domain: 'hattendo.jp' },
+  { name: '一六本舗', domain: 'www.itm-gr.co.jp' },
+  // 九州
+  { name: 'トライアル', domain: 'www.trial-net.co.jp' },
+  { name: 'ハローデイ', domain: 'www.halloday.co.jp' },
+  { name: 'ジョイフル', domain: 'www.joyfull.co.jp' },
+  { name: 'リンガーハット', domain: 'www.ringerhut.jp' },
+  { name: '石村萬盛堂', domain: 'www.ishimura.co.jp' },
+  { name: '竹下製菓', domain: 'takeshita-seika.jp' },
+  { name: 'セイカ食品', domain: 'www.seikafoods.jp' },
+  // 沖縄
+  { name: 'サンエー', domain: 'www.san-a.co.jp' },
+  // 全国
+  { name: '日世', domain: 'www.nissei-com.co.jp' },
 ]

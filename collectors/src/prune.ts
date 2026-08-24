@@ -2,7 +2,7 @@ import { client, log } from './db.js'
 import { dedupeKey, shouldCollect } from './keywords.js'
 
 /**
- * 収集済みの未処理候補に、現在のフィルタを適用し直す。
+ * 収集済みの未処理候補に、現在のフィルタを適用し直す（出所を問わない）。
  *
  * ノイズ判定を強化したときに使う。すでに承認・却下したものは触らない。
  * 判断を書き換えるのではなく、運営が確認する前の山を掃除するのが目的。
@@ -16,12 +16,11 @@ async function main() {
 
   const { data, error } = await supabase
     .from('product_submissions')
-    .select('id, name')
-    .eq('source', 'rakuten')
+    .select('id, name, manufacturer')
     .eq('status', 'pending')
   if (error) throw new Error(error.message)
 
-  const rows = data ?? []
+  const rows = (data ?? []) as { id: string; name: string; manufacturer: string | null }[]
   const noise: { id: string; name: string }[] = []
   const duplicated: { id: string; name: string }[] = []
   const seen = new Set<string>()
@@ -31,7 +30,9 @@ async function main() {
       noise.push(row)
       continue
     }
-    const key = dedupeKey(row.name)
+    // メーカーごとに突き合わせる。ブランドが違えば同じ商品名でも別物
+    // （サーティワンの「チョコミント」と赤城乳業の「チョコミント」は別商品）。
+    const key = `${row.manufacturer ?? ''}|${dedupeKey(row.name)}`
     if (seen.has(key)) {
       duplicated.push(row)
       continue

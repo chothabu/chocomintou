@@ -176,10 +176,14 @@ async function crawlBrand(brand: Brand): Promise<{ hits: Hit[]; pages: number }>
 async function main() {
   const save = process.argv.includes('--save')
   const only = process.argv[process.argv.indexOf('--brand') + 1]
+  // 追加したぶんだけ回したいときに使う（例: --from 85 で 86 番目以降）
+  const fromIndex = process.argv.includes('--from')
+    ? Number(process.argv[process.argv.indexOf('--from') + 1]) || 0
+    : 0
   const brands =
     process.argv.includes('--brand') && only
       ? BRANDS.filter((b) => b.name.includes(only))
-      : BRANDS
+      : BRANDS.slice(fromIndex)
 
   log(`${brands.length}ブランドを巡回します`)
   const allHits: Hit[] = []

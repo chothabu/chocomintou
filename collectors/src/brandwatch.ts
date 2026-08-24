@@ -17,7 +17,7 @@ import { isChocomint } from './keywords.js'
  */
 
 /** 1 ブランドあたりに取得するページ数の上限。相手のサーバーに負担をかけない。 */
-const MAX_PAGES_PER_BRAND = 12
+const MAX_PAGES_PER_BRAND = 16
 /** 取得間隔 */
 const DELAY_MS = 1200
 
@@ -26,6 +26,29 @@ const PATH_HINTS = [
   'product', 'goods', 'item', 'menu', 'news', 'release', 'information',
   'topics', 'lineup', 'brand', 'sweets', 'ice', 'dessert', 'flavor', 'whatsnew',
 ]
+
+/**
+ * チョコミントが載りやすいページを先に見るための手掛かり。
+ *
+ * 1 ブランドあたりの取得ページ数に上限があるので、順番が結果を左右する。
+ * ファミレスのようにメニューがカテゴリ別に分かれているサイトでは、
+ * デザート・ドリンクのページが後ろに来ると取りこぼす。
+ */
+const PRIORITY_HINTS = [
+  'dessert', 'sweets', 'ice', 'flavor', 'drink', 'cafe', 'parfait',
+  'デザート', 'スイーツ', 'アイス', 'ドリンク',
+]
+
+/** 優先度の高い順に並べ替える。 */
+function byPriority(urls: string[]): string[] {
+  return [...urls].sort((a, b) => {
+    const score = (u: string) => {
+      const lower = decodeURIComponent(u).toLowerCase()
+      return PRIORITY_HINTS.some((hint) => lower.includes(hint)) ? 0 : 1
+    }
+    return score(a) - score(b)
+  })
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -95,19 +118,35 @@ async function discoverFromSitemap(domain: string): Promise<string[]> {
   return [...new Set(found)]
 }
 
+/**
+ * そのブランドのサイトとみなせるか。
+ *
+ * 商品カタログを別ドメインに置いているチェーンがある
+ * （例: halloday.co.jp の商品は halloday-eshop.jp）。同一ドメインだけを辿ると
+ * 商品ページに到達できないため、社名の部分が一致するホストも同系列として扱う。
+ * 短い語は無関係なサイトに当たりやすいので 5 文字以上に限る。
+ */
+function isSameBrandHost(host: string, domain: string): boolean {
+  if (host === domain) return true
+  const label = domain.replace(/^www\./, '').split('.')[0]
+  return label.length >= 5 && host.includes(label)
+}
+
 /** トップページのリンクから、商品・新商品らしいページを拾う。 */
 function discoverFromLinks(html: string, domain: string): string[] {
   const found: string[] = []
   for (const m of html.matchAll(/href="([^"#]+)"/g)) {
     const href = m[1]
     if (/^(mailto:|tel:|javascript:)/i.test(href)) continue
-    let url: string
+    let parsed: URL
     try {
-      url = new URL(href, `https://${domain}/`).toString()
+      parsed = new URL(href, `https://${domain}/`)
     } catch {
       continue
     }
-    if (!url.startsWith(`https://${domain}`)) continue
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') continue
+    if (!isSameBrandHost(parsed.hostname, domain)) continue
+    const url = parsed.toString()
     if (/\.(jpg|jpeg|png|gif|pdf|css|js)(\?|$)/i.test(url)) continue
     const lower = url.toLowerCase()
     if (PATH_HINTS.some((hint) => lower.includes(hint))) found.push(url)
@@ -160,7 +199,9 @@ async function crawlBrand(brand: Brand): Promise<{ hits: Hit[]; pages: number }>
     targets.push(...(await discoverFromSitemap(brand.domain)))
   }
 
-  const unique = [...new Set(targets)].slice(0, MAX_PAGES_PER_BRAND)
+  // トップページは必ず見る。残りはチョコミントが載りやすい順に。
+  const rest = [...new Set(targets)].filter((u) => u !== top)
+  const unique = [top, ...byPriority(rest)].slice(0, MAX_PAGES_PER_BRAND)
   let pages = 0
   for (const url of unique) {
     const html = url === top ? topHtml : await fetchText(url)

@@ -150,11 +150,3 @@ struct ChainOffering: Identifiable, Hashable, Sendable {
 
     var id: String { chainName }
 }
-
-/// 近くにある、取り扱いチェーンの店舗。
-struct ChainStore: Identifiable, Hashable, Sendable {
-    var candidate: StoreCandidate
-    var offering: ChainOffering
-
-    var id: String { candidate.id }
-}

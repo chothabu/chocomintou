@@ -152,53 +152,55 @@ struct SearchView: View {
     private var storeList: some View {
         List {
             if !model.stores.isEmpty {
-                Section("チョコミントが見つかったお店") { sightedRows }
-            } else {
-                sightedRows
-            }
-
-            if !model.chainStores.isEmpty {
                 Section {
-                    ForEach(model.chainStores) { store in
-                        chainStoreRow(store)
+                    ForEach(model.stores) { pin in
+                        NavigationLink(value: AppRoute.store(pin.storeId)) {
+                            sightedRow(pin)
+                        }
                     }
                 } header: {
-                    Text("近くの取り扱いチェーン")
+                    Text("チョコミントが見つかったお店")
                 } footer: {
-                    Text("公式サイトでチェーンでの取り扱いを確認したお店です。その店に在庫があるかは分かりません。見つけたら報告してください。")
+                    Text("ユーザーが実際に見つけて報告したお店です。")
+                }
+            }
+
+            if !model.offerings.isEmpty {
+                Section {
+                    ForEach(model.offerings) { offering in
+                        offeringRow(offering)
+                    }
+                } header: {
+                    Text("チョコミントを扱っているチェーン")
+                } footer: {
+                    Text("公式サイトで取り扱いを確認したチェーンです。店舗ごとの在庫は分かりません。")
                 }
             }
         }
         .listStyle(.insetGrouped)
         .overlay {
-            if model.stores.isEmpty && model.chainStores.isEmpty && model.hasSearched {
+            if model.stores.isEmpty && model.offerings.isEmpty && model.hasSearched {
                 EmptyStateView(
                     symbol: "storefront",
-                    title: "目撃情報のあるお店がまだありません",
-                    message: "チョコミントを見つけたら、商品ページの「この商品を見つけた」から報告してください。最初の 1 件が地図を作ります。"
+                    title: "チョコミントのあるお店がまだありません",
+                    message: "見つけたら、商品ページの「この商品を見つけた」から報告してください。"
                 )
             }
         }
     }
 
-    /// 取り扱いチェーンの店舗。目撃情報と取り違えられないよう、
-    /// 鮮度バッジは出さず「チェーンで取り扱い」と明示する。
-    private func chainStoreRow(_ store: ChainStore) -> some View {
+    /// 目撃報告のあった店舗。距離は分かるときだけ添える。
+    private func sightedRow(_ pin: StorePin) -> some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(store.candidate.name)
+            Text(pin.storeName)
                 .font(.subheadline.weight(.semibold))
-            Text(store.offering.products.map(\.name).joined(separator: "、"))
+            Text(pin.items.map(\.productName).joined(separator: "、"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
             HStack(spacing: 8) {
-                Text("チェーンで取り扱い")
-                    .font(.caption2)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Palette.paleMint, in: Capsule())
-                    .foregroundStyle(Palette.deepMint)
-                if let distance = store.candidate.distance {
+                FreshnessBadge(freshness: pin.freshness)
+                if let distance = pin.distanceM {
                     Text(Formatters.distance(distance))
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
@@ -208,28 +210,26 @@ struct SearchView: View {
         .padding(.vertical, 2)
     }
 
-    private var sightedRows: some View {
-        ForEach(model.stores) { pin in
-                NavigationLink(value: AppRoute.store(pin.storeId)) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(pin.storeName)
-                            .font(.subheadline.weight(.semibold))
-                        Text(pin.items.map(\.productName).joined(separator: "、"))
+    /// 取り扱いチェーンと、そこで買える商品。
+    private func offeringRow(_ offering: ChainOffering) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(offering.chainName)
+                .font(.subheadline.weight(.semibold))
+            ForEach(offering.products) { product in
+                NavigationLink(value: AppRoute.product(product)) {
+                    HStack(spacing: 6) {
+                        Image(systemName: product.category.symbolName)
+                            .font(.caption2)
+                            .foregroundStyle(Palette.deepMint)
+                        Text(product.name)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                        HStack(spacing: 8) {
-                            FreshnessBadge(freshness: pin.freshness)
-                            if let distance = pin.distanceM {
-                                Text(Formatters.distance(distance))
-                                    .font(.caption.monospacedDigit())
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
+                        Spacer(minLength: 0)
                     }
-                    .padding(.vertical, 2)
+                    .contentShape(Rectangle())
                 }
             }
+        }
+        .padding(.vertical, 3)
     }
 
     private func runSearch() {

@@ -159,7 +159,7 @@ actor SampleBackend: ProductServing, StoreServing, SightingServing, ReviewServin
             }
         }
         return grouped
-            .map { ChainOffering(chainName: $0.key, products: $0.value) }
+            .map { ChainOffering(chainName: $0.key, brandColor: nil, products: $0.value) }
             .sorted { $0.chainName < $1.chainName }
     }
 

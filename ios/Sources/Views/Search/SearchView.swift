@@ -171,9 +171,9 @@ struct SearchView: View {
                         offeringRow(offering)
                     }
                 } header: {
-                    Text("チョコミントを扱っているチェーン")
+                    Text("店内で食べられるお店")
                 } footer: {
-                    Text("公式サイトで取り扱いを確認したチェーンです。店舗ごとの在庫は分かりません。")
+                    Text("公式サイトや各社の発表で取り扱いを確認したチェーンです。店舗ごとの提供状況は異なります。")
                 }
             }
         }
@@ -210,11 +210,16 @@ struct SearchView: View {
         .padding(.vertical, 2)
     }
 
-    /// 取り扱いチェーンと、そこで買える商品。
+    /// 取り扱いチェーンと、そこで食べられる商品。
+    ///
+    /// ロゴは商標なので使わず、ブランド色を敷いた頭文字で見分けられるようにする。
     private func offeringRow(_ offering: ChainOffering) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(offering.chainName)
-                .font(.subheadline.weight(.semibold))
+            HStack(spacing: 8) {
+                ChainMark(offering: offering)
+                Text(offering.chainName)
+                    .font(.subheadline.weight(.semibold))
+            }
             ForEach(offering.products) { product in
                 NavigationLink(value: AppRoute.product(product)) {
                     HStack(spacing: 6) {
@@ -225,6 +230,7 @@ struct SearchView: View {
                             .font(.caption)
                         Spacer(minLength: 0)
                     }
+                    .padding(.leading, 34)
                     .contentShape(Rectangle())
                 }
             }

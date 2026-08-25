@@ -322,3 +322,20 @@ struct RatingPicker: View {
         }
     }
 }
+
+/// チェーンの目印。
+///
+/// ロゴ画像は商標であり、各社のブランドガイドラインで無断利用を禁じているのが通例のため使わない。
+/// 代わりにブランド色を敷いた頭文字を出す。色が未設定ならアプリの色を使う。
+struct ChainMark: View {
+    let offering: ChainOffering
+    var size: CGFloat = 26
+
+    var body: some View {
+        Text(offering.initialText)
+            .font(.system(size: size * 0.5, weight: .bold))
+            .foregroundStyle(.white)
+            .frame(width: size, height: size)
+            .background(Color(hex: offering.brandColor) ?? Palette.deepMint, in: Circle())
+    }
+}

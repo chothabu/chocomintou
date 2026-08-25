@@ -146,7 +146,14 @@ struct StorePin: Identifiable, Hashable, Sendable {
 /// 個々の店舗に在庫があることの保証ではない。目撃情報とは別物として扱う。
 struct ChainOffering: Identifiable, Hashable, Sendable {
     var chainName: String
+    /// ブランド色（#RRGGBB）。ロゴは商標なので持たず、頭文字の背景にだけ使う。
+    var brandColor: String?
     var products: [Product]
 
     var id: String { chainName }
+
+    /// ロゴの代わりに出す頭文字。英字なら 1 文字、日本語なら 1 文字目。
+    var initialText: String {
+        String(chainName.prefix(1))
+    }
 }

@@ -70,26 +70,43 @@ struct SupabaseStoreService: StoreServing {
         let product: Product?
     }
 
-    /// 取り扱いチェーンと、そのチェーンで売っている商品。
+    /// 店内で飲食できるチェーンと、そこで食べられる商品。
+    ///
+    /// 小売のみのチェーンは含めない。「店舗」タブはそこで食べられる店を並べる場所で、
+    /// 買うだけの商品は「商品」タブで足りるため。
     func chainOfferings() async throws -> [ChainOffering] {
-        let query = PostgRESTQuery("product_channels")
-            .select("chain_name,product:products(*)")
-        let rows = try await client.fetch(query, as: [ChannelRow].self)
+        async let channelsTask = client.fetch(
+            PostgRESTQuery("product_channels").select("chain_name,product:products(*)"),
+            as: [ChannelRow].self
+        )
+        async let chainsTask = client.fetch(
+            PostgRESTQuery("chains").select("name,brand_color").isTrue("is_eat_in"),
+            as: [ChainRow].self
+        )
+        let (channels, chains) = try await (channelsTask, chainsTask)
+        let colors = Dictionary(uniqueKeysWithValues: chains.map { ($0.name, $0.brandColor) })
 
         var grouped: [String: [Product]] = [:]
-        for row in rows {
+        for row in channels {
+            // 店内飲食できるチェーンだけを対象にする
+            guard colors.keys.contains(row.chainName) else { continue }
             // 未公開の商品は RLS で除外され、埋め込みが null になる
             guard let product = row.product, product.saleStatus != .ended else { continue }
             grouped[row.chainName, default: []].append(product)
         }
         return grouped
-            .map { ChainOffering(chainName: $0.key, products: $0.value) }
+            .map { ChainOffering(chainName: $0.key, brandColor: colors[$0.key] ?? nil, products: $0.value) }
             .sorted { $0.chainName < $1.chainName }
     }
 
     private struct ChannelRow: Decodable, Sendable {
         let chainName: String
         let product: Product?
+    }
+
+    private struct ChainRow: Decodable, Sendable {
+        let name: String
+        let brandColor: String?
     }
 
     func store(id: UUID) async throws -> Store? {

@@ -16,6 +16,20 @@ enum Palette {
     static let past = Color(red: 0.639, green: 0.663, blue: 0.671)
 }
 
+extension Color {
+    /// "#RRGGBB" から作る。読めない値のときは nil。
+    init?(hex: String?) {
+        guard let hex, hex.hasPrefix("#"), hex.count == 7,
+              let value = UInt32(hex.dropFirst(), radix: 16)
+        else { return nil }
+        self.init(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255
+        )
+    }
+}
+
 enum Metrics {
     static let cardCorner: CGFloat = 14
     static let sectionSpacing: CGFloat = 28

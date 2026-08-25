@@ -28,7 +28,9 @@ final class SearchViewModel {
     var hasSearched = false
 
     private var searchTask: Task<Void, Never>?
-    private static let pageSize = 40
+    // 図鑑がまだ数百件の規模なので一度に読む。
+    // これを超える件数になったらページ送りが要る。
+    private static let pageSize = 200
 
     /// 入力のたびに投げると通信が増えるので、少し待ってからまとめて実行する。
     func scheduleSearch(services: AppServices, coordinate: CLLocationCoordinate2D?) {

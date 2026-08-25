@@ -175,4 +175,32 @@ export const BRANDS: Brand[] = [
   { name: 'サンエー', domain: 'www.san-a.co.jp' },
   // 全国
   { name: '日世', domain: 'www.nissei-com.co.jp' },
+
+  // ---- ロケスマのカフェ / バーガー / スイーツから追加（店舗数 30 以上）----
+  { name: 'ディッピンドッツ', domain: 'www.dippindots.jp' },  // スイーツ/お菓子 600+店
+  { name: 'サブウェイ', domain: 'www.subway.co.jp' },  // バーガー 200+店
+  { name: 'ZETTERIA', domain: 'www.zetteria.jp' },  // バーガー 200+店
+  { name: 'ヨックモック', domain: 'www.yokumoku.co.jp' },  // スイーツ/お菓子 200+店
+  { name: 'もち吉', domain: 'www.mochikichi.co.jp' },  // スイーツ/お菓子 200+店
+  { name: 'おかしのまちおか', domain: 'www.machioka.co.jp' },  // スイーツ/お菓子 200+店
+  { name: 'あじまん', domain: 'www.ajiman.co.jp' },  // スイーツ/お菓子 200+店
+  { name: '赤福', domain: 'www.akafuku.co.jp' },  // スイーツ/お菓子 100+店
+  { name: '福砂屋', domain: 'www.fukusaya.co.jp' },  // スイーツ/お菓子 100+店
+  { name: '源 吉兆庵', domain: 'www.kitchoan.co.jp' },  // スイーツ/お菓子 100+店
+  { name: '桂新堂', domain: 'www.keishindo.co.jp' },  // スイーツ/お菓子 100+店
+  { name: '文明堂総本店', domain: 'www.bunmeido.co.jp' },  // スイーツ/お菓子 100+店
+  { name: '坂角総本舗', domain: 'www.bankaku.co.jp' },  // スイーツ/お菓子 100+店
+  { name: 'フロプレステージュ', domain: 'www.flo-prestige.com' },  // スイーツ/お菓子 100+店
+  { name: 'ディッパーダン', domain: 'www.dipperdan.jp' },  // スイーツ/お菓子 100+店
+  { name: 'ホリーズカフェ', domain: 'www.hollys.jp' },  // カフェ 100+店
+  { name: 'ベローチェ', domain: 'www.veloce.co.jp' },  // カフェ 100+店
+  { name: 'ブールミッシュ', domain: 'www.boulmich.co.jp' },  // スイーツ/お菓子 90+店
+  { name: 'クリスピークリーム', domain: 'www.krispykreme.jp' },  // カフェ 90+店
+  { name: '神戸風月堂', domain: 'www.kobefugetsudo.com' },  // スイーツ/お菓子 80+店
+  { name: '御座候', domain: 'www.gozasoro.co.jp' },  // スイーツ/お菓子 80+店
+  { name: 'とらや', domain: 'www.toraya-group.co.jp' },  // スイーツ/お菓子 80+店
+  { name: 'イタトマ', domain: 'www.italiantomato.co.jp' },  // カフェ 80+店
+  { name: 'アフタヌーンティー', domain: 'www.afternoon-tea.com' },  // カフェ 80+店
+  { name: 'ウェンディーズ', domain: 'www.wendys.com' },  // バーガー 70+店
+  { name: '銀座あけぼの', domain: 'www.ginza-akebono.co.jp' },  // スイーツ/お菓子 70+店
 ]

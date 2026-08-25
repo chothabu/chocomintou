@@ -156,3 +156,21 @@ test('商品名からカテゴリを推定する', () => {
   assert.equal(guessCategory('チョコミントクッキー'), 'snack')
   assert.equal(guessCategory('チョコミントなにか'), 'other')
 })
+
+// PAPABUBBLE の全 16 ページ（利用規約を含む）で「チョコミント」が検出された。
+// 原因は全ページ共通のナビゲーションで、商品名ではない。
+test('全ページに出る語はナビとみなす', () => {
+  const pages = 16
+  const seenOn = new Map([['チョコミント', 16], ['チョコミントキャンディ', 2]])
+  const isBoilerplate = (s: string) => pages >= 3 && (seenOn.get(s) ?? 0) >= pages
+  assert.ok(isBoilerplate('チョコミント'), 'ナビの語を落とせていない')
+  assert.ok(!isBoilerplate('チョコミントキャンディ'), '商品名まで落としている')
+})
+
+test('ページ数が少ないときはナビ判定しない', () => {
+  // 1〜2 ページしか取れないサイトでは、たまたま全ページに出ただけかもしれない
+  const pages = 2
+  const seenOn = new Map([['チョコミントバー', 2]])
+  const isBoilerplate = (s: string) => pages >= 3 && (seenOn.get(s) ?? 0) >= pages
+  assert.ok(!isBoilerplate('チョコミントバー'))
+})

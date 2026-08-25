@@ -205,4 +205,8 @@ export const BRANDS: Brand[] = [
   { name: '銀座あけぼの', domain: 'www.ginza-akebono.co.jp' },  // スイーツ/お菓子 70+店
   // ---- 検索で見つけたチェーン ----
   { name: 'よーじや', domain: 'www.yojiya.co.jp' },
+  { name: 'さかい珈琲', domain: 'www.sakaicoffee.com' },
+  { name: '椿屋珈琲', domain: 'www.tsubakiya-coffee.com' },
+  { name: 'キル フェ ボン', domain: 'www.quil-fait-bon.com' },
+  { name: 'PAPABUBBLE', domain: 'www.papabubble.jp' },
 ]

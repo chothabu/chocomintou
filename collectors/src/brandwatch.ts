@@ -203,13 +203,30 @@ async function crawlBrand(brand: Brand): Promise<{ hits: Hit[]; pages: number }>
   const rest = [...new Set(targets)].filter((u) => u !== top)
   const unique = [top, ...byPriority(rest)].slice(0, MAX_PAGES_PER_BRAND)
   let pages = 0
+  const raw: Hit[] = []
+  const seenOn = new Map<string, number>()
+
   for (const url of unique) {
     const html = url === top ? topHtml : await fetchText(url)
     if (url !== top) await sleep(DELAY_MS)
     if (!html) continue
     pages += 1
     const snippets = extractSnippets(html)
-    if (snippets.length > 0) hits.push({ brand, url, snippets })
+    if (snippets.length === 0) continue
+    raw.push({ brand, url, snippets })
+    for (const snippet of snippets) {
+      seenOn.set(snippet, (seenOn.get(snippet) ?? 0) + 1)
+    }
+  }
+
+  // 全ページに出てくる語はナビやフッターの共通部分で、商品名ではない。
+  // （利用規約ページにまで「チョコミント」が出るのはそのため）
+  const isBoilerplate = (snippet: string) =>
+    pages >= 3 && (seenOn.get(snippet) ?? 0) >= pages
+
+  for (const hit of raw) {
+    const kept = hit.snippets.filter((s) => !isBoilerplate(s))
+    if (kept.length > 0) hits.push({ ...hit, snippets: kept })
   }
   return { hits, pages }
 }

@@ -1,54 +1,128 @@
--- ローカル開発用のシードデータ。
+-- ローカル開発用のシード。`supabase db reset` のときだけ流れる。
 --
--- `supabase db reset` のときだけ自動で流れる。本番には入らない。
--- 目的は「アプリとバックエンドが正しくつながっているか」を確かめることなので、
--- 商品名は実在のものではなく、動作確認用と分かる名前にしてある。
+-- ここに入っているのは、運営が出典を確認して公開した実データ。
+-- 手作業で積み上げたものなので、DB を作り直しても失われないようにファイルに残す。
 --
--- 実際の商品データは、管理画面での登録か収集バッチ（collectors/）から入れる。
+-- 更新するとき:
+--   docker exec supabase_db_chocomint-app psql -U postgres -tAc "<products を format した select>"
+--   のように現在の内容を書き出して差し替える。
+--
+-- 収集した候補（product_submissions）は含めない。バッチを回せば再現できるため。
 
--- 収集元の例。利用条件を確認したうえで管理画面から有効にする。
+-- 収集元。利用条件を確認したうえで管理画面から有効にする。
 insert into news_sources (name, feed_url, is_enabled)
-values ('PR TIMES', 'https://prtimes.jp/index.rdf', false);
+values ('PR TIMES', 'https://prtimes.jp/index.rdf', false)
+on conflict (feed_url) do nothing;
 
--- ---- 動作確認用ユーザー ----
+-- 動作確認用のユーザー（レビューや目撃の投稿者として使う）
 insert into auth.users (id, email, aud, role)
-values ('00000000-0000-0000-0000-0000000000a1', 'dev@example.com', 'authenticated', 'authenticated');
+values ('00000000-0000-0000-0000-0000000000a1', 'dev@example.com', 'authenticated', 'authenticated')
+on conflict (id) do nothing;
 
 insert into users (id, display_name)
-values ('00000000-0000-0000-0000-0000000000a1', '動作確認ユーザー');
+values ('00000000-0000-0000-0000-0000000000a1', '動作確認ユーザー')
+on conflict (id) do nothing;
 
--- ---- 動作確認用の商品 ----
-insert into products (id, name, manufacturer, description, category, price,
-                      release_date, sale_status, is_limited, sales_channel_text, is_published)
-values
-  ('00000000-0000-0000-0000-0000000000b1', '【動作確認】チョコミントアイス', '確認用メーカー',
-   'ローカル動作確認のためのデータです。', 'ice', 238, current_date - 7, 'on_sale', true,
-   '動作確認用', true),
-  ('00000000-0000-0000-0000-0000000000b2', '【動作確認】ミントチョコクッキー', '確認用メーカー',
-   'ローカル動作確認のためのデータです。', 'snack', 198, current_date - 30, 'on_sale', false,
-   '動作確認用', true),
-  ('00000000-0000-0000-0000-0000000000b3', '【動作確認】未公開の商品', '確認用メーカー',
-   'is_published = false。アプリから見えないことの確認用。', 'other', null, current_date, 'on_sale', false,
-   null, false);
+-- ---- チェーン ----
+insert into chains (name, is_eat_in, brand_color) values ('Afternoon Tea LOVE&TABLE', 'f', '#4A7C59') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('BOUL’ANGE', 't', '#4A3B2A') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('UNI DONUTS', 't', '#F2A2C0') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('イタリアントマト', 't', '#C8102E') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ゴディバ', 't', '#8B6F3E') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('サーティワンアイスクリーム', 't', '#E4002B') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('シャトレーゼ', 'f', NULL) on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ジョエル・ロブション', 't', '#8B0000') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ディッピンドッツ', 't', '#0057B8') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ビアードパパ', 't', '#F5B700') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ホテルニューグランド', 't', '#1B3A6B') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('マクドナルド', 't', '#C8102E') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('むさしの森珈琲', 't', '#8B5E3C') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('よーじや', 'f', '#E8B4A0') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('リンツ', 't', '#B8860B') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ローソン', 'f', NULL) on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ロールアイスクリームファクトリー', 't', '#00A9A5') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ロイズ', 'f', NULL) on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('ロイヤルパークホテル', 't', '#1F3A5F') on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('無印良品', 'f', NULL) on conflict (name) do nothing;
+insert into chains (name, is_eat_in, brand_color) values ('銀座コージーコーナー', 't', '#C8102E') on conflict (name) do nothing;
 
-insert into product_channels (product_id, chain_name)
-values ('00000000-0000-0000-0000-0000000000b1', 'familymart');
+-- ---- 商品 ----
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('9c01c556-dc7d-4d75-ba2e-601c19fdb275','ホワイトミントとショコラのミルクレープ','Afternoon Tea LOVE&TABLE','初夏限定（2026年5月14日〜7月22日）','cake',NULL,null,'2026-05-14','2026-07-22','ended','t','Afternoon Tea LOVE&TABLE 各店','https://www.afternoon-tea.com/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('3ff90af4-bc87-41e7-8c41-1a108c630216','チョコミントフェア','BOUL’ANGE','ミント度で選べる夏限定フェア','bread',NULL,null,NULL,NULL,'on_sale','t','BOUL’ANGE 各店','https://prtimes.jp/main/html/rd/p/000002561.000011498.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('5d7822f9-1999-4af0-9baa-190628e3cc4a','チョコミント（ドーナツ）','UNI DONUTS','横浜ベイクォーター店の限定フレーバー','snack',NULL,null,NULL,NULL,'on_sale','t','UNI DONUTS 各店','https://prtimes.jp/main/html/rd/p/000000111.000084389.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('b0ad0f35-0ddd-4edb-b31d-6f7ca4b6daa7','チョコミントショートケーキ','イタリアントマト','ケーキ・スイーツのメニューに掲載','cake',NULL,null,NULL,NULL,'on_sale','f','イタリアントマト 各店','https://www.italiantomato.co.jp/menus/cake_sweets/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('51540e30-6b65-46d6-a3a2-1987c401edd9','ショコリキサー チョコミント','ゴディバ','チョコミントフェスの強ミント版','drink',NULL,null,NULL,NULL,'on_sale','t','ゴディバ 各店','https://prtimes.jp/main/html/rd/p/000000913.000015355.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('bf4bf380-1a87-461e-bd8c-4f1a982416e3','チョコミント','サーティワンアイスクリーム','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','f','サーティワン各店','https://www.31ice.co.jp/contents/flavor/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('d51cf80b-6b36-4330-8b3e-9db16394b55c','チョコミント クッキーチャム','サーティワンアイスクリーム','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','f','サーティワン各店','https://www.31ice.co.jp/contents/product/varietybox.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('5851dcfd-e66a-40bc-9d73-60b1487e8829','クッキー＆クランチバー チョコミント','シャトレーゼ','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','f','シャトレーゼ各店','https://www.chateraise.co.jp/ec/c/cice/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('d447dfae-2e0c-4f9e-9f51-20a15217583b','チョコミントバー','シャトレーゼ','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','f','シャトレーゼ各店','https://www.chateraise.co.jp/ec/c/cice-bar/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('7714e4d8-7a46-4236-a44e-ff142c6de798','デザートショコラボール チョコミント','シャトレーゼ','公式サイトの掲載を確認して登録しています。','snack',NULL,null,NULL,NULL,'on_sale','f','シャトレーゼ各店','https://www.chateraise.co.jp/ec/c/cice-othr/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('a760d246-03e3-40ae-9a38-21d596ea65af','チョコミント（夏の新作スイーツ）','ジョエル・ロブション','夏の新作スイーツ全 4 種のうちの 1 つ','cake',NULL,null,NULL,NULL,'on_sale','t','ジョエル・ロブション 各店','https://prtimes.jp/main/html/rd/p/000000919.000002646.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('8499e495-be5e-49e6-a85a-b2e8adc790a6','チョコミントパウチ','チロルチョコ','公式サイトの掲載を確認して登録しています。','snack',NULL,null,NULL,NULL,'on_sale','f','全国のコンビニ・スーパー','https://www.tirol-choco.com/news/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('b9313541-04dd-4577-a619-bd1adf9185b1','チョコミントもち','チロルチョコ','公式サイトの掲載を確認して登録しています。','snack',NULL,null,NULL,NULL,'on_sale','f','全国のコンビニ・スーパー','https://www.tirol-choco.com/news/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('395cf0e9-7461-4686-b22c-eebddbdd6efe','チョコミント','ディッピンドッツ','フレーバー一覧に掲載。粒状アイス','ice',NULL,null,NULL,NULL,'on_sale','f','ディッピンドッツ 各店','https://dippindots.jp/flavor',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('ab4adde9-7167-4c03-9fe9-ce5efbbcd38e','飲む、ご褒美チョコミント','トモヱ乳業','Makuake で 200 セット限定','drink',NULL,null,'2026-07-01','2026-08-30','on_sale','t',NULL,'https://prtimes.jp/main/html/rd/p/000000013.000118069.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('8c6b275d-05da-404c-82b6-3c2a2307a4b9','ザクザクチョコミント','なまくり','自販機販売。250ml 950円','drink',NULL,null,'2026-07-16','2026-09-15','on_sale','t',NULL,'https://prtimes.jp/main/html/rd/p/000000036.000099843.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('aa42af5e-d01d-4501-a2e4-3b31a0887dc4','ミニカップ ショコラミント エクストラ','ハーゲンダッツ','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/beisia/cabinet/ice/ice1/4976994207199-18_00.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00s0vmo.288ow295.g00s0vmo.288oxa26/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbeisia%2F4976994207199-18%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbeisia%2Fi%2F10198712%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','ベイシア楽天市場店',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('1d02cd34-33a5-4d11-802b-03a92d893acb','チョコミントシュー','ビアードパパ','販売エリアを拡大','cake',NULL,null,NULL,NULL,'on_sale','t','ビアードパパ 各店','https://prtimes.jp/main/html/rd/p/000000423.000007024.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('85a3c87e-72b8-44fb-adc3-78f891c371f0','チョコミントサンドＷ','フジパン','公式サイトの掲載を確認して登録しています。','bread',NULL,null,NULL,NULL,'on_sale','f','全国のスーパー・コンビニ','https://www.fujipan.co.jp/product/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('a0f3773e-b2f8-4fdd-96a6-4f35ae1287bd','チョコミントパフェ','ホテルニューグランド','コーヒーハウス ザ・カフェで提供。2,277円','parfait',NULL,null,'2026-08-01','2026-08-31','on_sale','t','ホテルニューグランド 各店','https://prtimes.jp/main/html/rd/p/000002481.000030117.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('4819bc0a-125d-4d78-bc0b-b7bba09f7a9f','クッキー&チョコミントフラッペ','マクドナルド','公式サイトの掲載を確認して登録しています。','drink',NULL,null,NULL,NULL,'on_sale','t','McCafé by Barista 併設店舗','https://www.mcdonalds.co.jp/products/800047/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('395c3540-2d14-443c-a950-c90853e35d77','アイスチョコミントラテ','むさしの森珈琲','エスプレッソとチョコを合わせた大人向け','drink',NULL,null,NULL,NULL,'on_sale','f','むさしの森珈琲 各店','https://www.skylark.co.jp/mmcoffee/menu/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('752d5389-7c5b-47d5-9059-31334cb01314','チョコミントラテ','むさしの森珈琲','公式サイトの掲載を確認して登録しています。','drink',NULL,null,NULL,NULL,'on_sale','t','むさしの森珈琲 各店','https://www.skylark.co.jp/mmcoffee/menu/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('a1799ad0-0f8a-4785-96b8-1919551f3844','スースーパフェ','よーじや','ミントゼリー・チョコミントアイス・生チョコを重ねたパフェ','parfait',NULL,null,NULL,'2026-08-11','ended','t','よーじや 各店','https://www.yojiya.co.jp/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('1bf5f4ba-58e2-4938-9ae4-a1ac447d3733','The Lindt Style チョコミント ショコラドリンク','リンツ','898円。全国のリンツ ショコラ ブティック&カフェ','drink',NULL,null,'2026-08-01','2026-09-30','on_sale','t','リンツ 各店','https://prtimes.jp/main/html/rd/p/000000149.000069940.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('a31f1bb5-3853-4f47-9d31-ba1a4cd9b076','チョコミント ソーダフロート','リンツ','公式サイトの掲載を確認して登録しています。','drink',NULL,null,'2026-06-01','2026-08-31','on_sale','t','リンツ ショコラ カフェ','https://www.lindt.jp/contents/menu/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('56d83977-3cc8-41c8-96ad-260bd9851938','チョコミントショコラドリンク','リンツ','公式サイトの掲載を確認して登録しています。','drink',NULL,null,NULL,NULL,'on_sale','t','リンツ ショコラ カフェ','https://www.lindt.jp/contents/menu/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('0a25cfc6-d214-4b41-9ed9-ff2d666b4a17','チョコミントワッフルコーン','ローソン','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','t','全国のローソン','https://www.lawson.co.jp/recommend/original/select/icecreem/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('47937c5a-76d4-4c4a-824d-fe1ffb739fe4','チョコミント限界突破チャレンジ','ロールアイスクリームファクトリー','追いミントで爽快感を調整できる','ice',NULL,null,NULL,NULL,'on_sale','t','ロールアイスクリームファクトリー 各店','https://prtimes.jp/main/html/rd/p/000000137.000034651.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('31b9c09d-d980-4d40-9bea-682bad1d98fa','アマンドショコラ［チョコミント］','ロイズ','公式サイトの掲載を確認して登録しています。','snack',NULL,null,NULL,NULL,'on_sale','f','ロイズ各店・通販','https://www.royce.com/goods/list/?in_category=C001',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('9a97292e-e5fd-48cd-a71d-3e59447052fe','生チョコレート［チョコミント］','ロイズ','公式サイトの掲載を確認して登録しています。','snack',NULL,null,NULL,NULL,'on_sale','f','ロイズ各店・通販','https://www.royce.com/goods/list/?in_category=C001',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('e7f55c8b-72e0-4ce0-9904-0c8c0a31a665','チョコミントアフタヌーンティー','ロイヤルパークホテル','毎年 9 月に登場','parfait',NULL,null,NULL,NULL,'on_sale','t','ロイヤルパークホテル 各店','https://prtimes.jp/main/html/rd/p/000001369.000039557.html',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('b00cfc1e-e7ff-4ece-8adb-abf2090bda3d','小さなアイス屋さん チョコミント','ロッテ','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/macaron-store/cabinet/img15/m-kn-147-1_g1.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00rxxjo.288ow258.g00rxxjo.288ox75d/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmacaron-store%2Fm-kn-147%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmacaron-store%2Fi%2F10030453%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','Macaron',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('66f025de-3621-41ee-b7ca-2a618038c0d2','小さなアイス屋さん チョコミントとカスタードバニラ','ロッテ','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/manten/cabinet/mint-vanilla-resized.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00pinco.288owc62.g00pinco.288oxfef/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmanten%2Fk93000100%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmanten%2Fi%2F10014979%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','満店プロ市場',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('fbe6f04c-dde6-42a1-a4ac-381830e5d3cb','カントリーマアム ミニ チョコミント','不二家','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','snack','https://thumbnail.image.rakuten.co.jp/@0_mall/meso-store/cabinet/amayahoo/07272655/2057-016065.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00tivno.288owa25.g00tivno.288ox56c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmeso-store%2F2057-016065%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmeso-store%2Fi%2F10009051%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','meso-store',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('40348861-9361-47c1-b3b7-d162b903813f','チョコミントアイス','北見ハッカ通商','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_gold/irankarapte/images/product/sweets/kitamihakka-ice6/kitamihakka-ice6_thum01.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00tbcvo.288owec9.g00tbcvo.288oxfbc/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Firankarapte%2Fkitamihakka-ice6%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Firankarapte%2Fi%2F10000648%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','北海道の美食逸品 イランカラプテ',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('4761cb6e-9520-443b-8109-9a55620b84d9','ハッカ飴 チョコミントキャンディ','北見ハッカ通商','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','snack','https://thumbnail.image.rakuten.co.jp/@0_mall/beautyspice/cabinet/kitamihakka/000000000017-01-l.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00u6n4o.288ow94e.g00u6n4o.288oxdff/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbeautyspice%2F4985146000908%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbeautyspice%2Fi%2F10001698%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','Beauty Spice 楽天市場店',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('3ee45e79-4777-41a6-bbeb-9f8eebb2f157','メンタブ チョコミント','北見ハッカ通商','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','snack','https://thumbnail.image.rakuten.co.jp/@0_mall/beautyspice/cabinet/kitamihakka/000000000036-01-l.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00u6n4o.288ow94e.g00u6n4o.288oxdff/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbeautyspice%2F4985146000830%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbeautyspice%2Fi%2F10001699%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','Beauty Spice 楽天市場店',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('be73b8a3-07cd-46e7-b821-485ce084a677','エッセル スーパーカップ チョコミント','明治','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/kosakasyoten/cabinet/imgrc0116113953.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00tpkco.288ow924.g00tpkco.288oxbc2/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkosakasyoten%2F135378120300222%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fkosakasyoten%2Fi%2F10001196%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','小阪商店',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('4b32ea8c-aa8d-407a-91b5-f1135a7074b7','チョコミント MO','森永乳業','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/party-ice/cabinet/shohingazo/4l_ice/4l-chocominto/4lchocominto1.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00u76qo.288ow3ab.g00u76qo.288ox74c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fparty-ice%2F21395111%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fparty-ice%2Fi%2F10000006%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','パーティーアイス',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('3bae8282-24da-4412-94e6-3455175c192c','チョコミントポッキー','江崎グリコ','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','snack','https://thumbnail.image.rakuten.co.jp/@0_gold/poipoimarket/images/202605/t04901005017092.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00ru2jo.288ow118.g00ru2jo.288ox75f/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fpoipoimarket%2Ft04901005017092%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fpoipoimarket%2Fi%2F10057708%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','菓子の新商品はポイポイマーケット',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('d1fb1d65-df59-4d45-a27f-2f7c477f2500','牛乳でつくる チョコミントラテ','無印良品','楽天市場の検索結果から自動収集','drink','https://thumbnail.image.rakuten.co.jp/@0_mall/diomart/cabinet/diopic/systempic168/b0f4vvtdsrv-00.jpg?_ex=128x128',null,'2026-08-22',NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00upq4o.288ow752.g00upq4o.288ox125/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fdiomart%2Fb0gv1q7y86%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fdiomart%2Fi%2F10106857%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','DIOマート',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('65aff365-0a05-47c5-8730-a10eba04c132','ブラックモンブラン チョコミント','竹下製菓','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','t','九州を中心とした店舗','https://takeshita-seika.jp/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('587eb1b8-61ba-4ad8-885e-aeba9ba6fa77','BLACK・チョコミント','赤城乳業','公式サイトの掲載を確認して登録しています。','ice',NULL,null,NULL,NULL,'on_sale','f','全国のコンビニ・スーパー','https://www.akagi.com/products/',NULL,true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('5bc533fa-0abc-49b8-a04a-bea8a3385dc1','スペシャルパフェ ダブルチョコミント','赤城乳業','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','parfait','https://thumbnail.image.rakuten.co.jp/@0_mall/macaron-store/cabinet/img19/k-kr-118-1_g1.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00rxxjo.288ow258.g00rxxjo.288ox75d/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmacaron-store%2Fk-kr-118%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmacaron-store%2Fi%2F10035403%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','Macaron',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('c4e9ca9e-42f9-4fd3-8759-a74c46b243d6','セルフチョコレートクラッシュ チョコミント','赤城乳業','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/smilespoon/cabinet/04/7115104-0006_1.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00tmwco.288owbe0.g00tmwco.288ox6e7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsmilespoon%2F7115104-0006%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fsmilespoon%2Fi%2F10026750%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','Smile Spoon 楽天市場店',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('36066a3e-1dc4-4a60-ab91-06bcb1ee5335','チョコミント クールアイスバー','赤城乳業','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/8kakuya/cabinet/1/1bn372.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00ssjeo.288ow560.g00ssjeo.288ox42e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2F8kakuya%2Fice016%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2F8kakuya%2Fi%2F10000136%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','八角家',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('0e087040-92f0-46db-9872-a168ecedb6ce','チョコミントカップ','赤城乳業','楽天市場の出品情報をもとに登録しています。価格や取り扱いは店舗により異なります。','ice','https://thumbnail.image.rakuten.co.jp/@0_mall/8kakuya/cabinet/imgrc0098740994.jpg?_ex=128x128',null,NULL,NULL,'on_sale','f',NULL,'https://hb.afl.rakuten.co.jp/hgc/g00ssjeo.288ow560.g00ssjeo.288ox42e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2F8kakuya%2Fi262%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2F8kakuya%2Fi%2F10000693%2F&rafcid=wsc_i_is_7e2b710e-a036-4a0f-8309-b6c6e46196eb','八角家',true);
+insert into products (id,name,manufacturer,description,category,image_url,price,release_date,end_date,sale_status,is_limited,sales_channel_text,official_url,online_shop_name,is_published) values ('999008f1-9b7f-47e8-b6a5-8370e3c04849','チョコミントミルクレープ','銀座コージーコーナー','ミント感をアップして再登場','cake',NULL,null,NULL,NULL,'on_sale','t','銀座コージーコーナー 各店','https://prtimes.jp/main/html/rd/p/000001444.000004367.html',NULL,true);
 
--- ---- 目撃情報（渋谷駅周辺） ----
--- report_sighting は auth.uid() を見るので、シードでは直接 insert する。
-insert into stores (id, name, chain_name, latitude, longitude, address, external_source, external_store_id)
-values ('00000000-0000-0000-0000-0000000000c1', '【動作確認】渋谷の店舗', 'familymart',
-        35.6620, 139.6990, '東京都渋谷区', 'admin', 'seed-c1');
-
-insert into sightings (product_id, store_id, user_id, found_at)
-values
-  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1',
-   '00000000-0000-0000-0000-0000000000a1', now() - interval '2 hours'),
-  ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-0000000000c1',
-   '00000000-0000-0000-0000-0000000000a1', now() - interval '3 days');
-
--- ---- レビュー（集計トリガーとミントレベルの確認用） ----
-insert into reviews (user_id, product_id, overall_rating, mint_intensity, chocolate_intensity,
-                     sweetness, freshness, comment)
-values ('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b1',
-        5, 5, 3, 4, 5, 'アプリとバックエンドがつながっていれば、このレビューが表示されます。');
+-- ---- 商品とチェーンの紐付け ----
+insert into product_channels (product_id, chain_name) values ('9c01c556-dc7d-4d75-ba2e-601c19fdb275', 'Afternoon Tea LOVE&TABLE') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('3ff90af4-bc87-41e7-8c41-1a108c630216', 'BOUL’ANGE') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('5d7822f9-1999-4af0-9baa-190628e3cc4a', 'UNI DONUTS') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('b0ad0f35-0ddd-4edb-b31d-6f7ca4b6daa7', 'イタリアントマト') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('51540e30-6b65-46d6-a3a2-1987c401edd9', 'ゴディバ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('d51cf80b-6b36-4330-8b3e-9db16394b55c', 'サーティワンアイスクリーム') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('bf4bf380-1a87-461e-bd8c-4f1a982416e3', 'サーティワンアイスクリーム') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('5851dcfd-e66a-40bc-9d73-60b1487e8829', 'シャトレーゼ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('d447dfae-2e0c-4f9e-9f51-20a15217583b', 'シャトレーゼ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('7714e4d8-7a46-4236-a44e-ff142c6de798', 'シャトレーゼ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('a760d246-03e3-40ae-9a38-21d596ea65af', 'ジョエル・ロブション') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('395cf0e9-7461-4686-b22c-eebddbdd6efe', 'ディッピンドッツ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('1d02cd34-33a5-4d11-802b-03a92d893acb', 'ビアードパパ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('a0f3773e-b2f8-4fdd-96a6-4f35ae1287bd', 'ホテルニューグランド') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('4819bc0a-125d-4d78-bc0b-b7bba09f7a9f', 'マクドナルド') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('395c3540-2d14-443c-a950-c90853e35d77', 'むさしの森珈琲') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('752d5389-7c5b-47d5-9059-31334cb01314', 'むさしの森珈琲') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('a1799ad0-0f8a-4785-96b8-1919551f3844', 'よーじや') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('1bf5f4ba-58e2-4938-9ae4-a1ac447d3733', 'リンツ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('56d83977-3cc8-41c8-96ad-260bd9851938', 'リンツ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('a31f1bb5-3853-4f47-9d31-ba1a4cd9b076', 'リンツ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('0a25cfc6-d214-4b41-9ed9-ff2d666b4a17', 'ローソン') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('47937c5a-76d4-4c4a-824d-fe1ffb739fe4', 'ロールアイスクリームファクトリー') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('31b9c09d-d980-4d40-9bea-682bad1d98fa', 'ロイズ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('9a97292e-e5fd-48cd-a71d-3e59447052fe', 'ロイズ') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('e7f55c8b-72e0-4ce0-9904-0c8c0a31a665', 'ロイヤルパークホテル') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('d1fb1d65-df59-4d45-a27f-2f7c477f2500', '無印良品') on conflict do nothing;
+insert into product_channels (product_id, chain_name) values ('999008f1-9b7f-47e8-b6a5-8370e3c04849', '銀座コージーコーナー') on conflict do nothing;

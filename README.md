@@ -44,7 +44,8 @@ npm install
 | `npm run collect:news` | ニュース記事（登録した RSS から） | 毎日 |
 | `npm run collect:products` | 楽天の市販品・通販の取扱店 | 週次 |
 | `npm run collect:prtimes` | **チョコミントを出した実績のある店**（プレスリリース） | 週次 |
-| `npm run watch:brands` | チェーン公式サイトの取扱商品（85 ブランド） | 週次 |
+| `npm run watch:brands` | チェーン公式サイトの取扱商品（152 ブランド） | 週次 |
+| `npm run expire` | 提供期間が過ぎた商品を販売終了にする | 毎日 |
 | `npm run prune` | 収集済み候補に現在のフィルタをかけ直す | 随時 |
 
 `--save` を付けると候補として登録し、付けなければ結果を表示するだけです。
@@ -207,7 +208,6 @@ npm run dev                  # http://localhost:3000
 未実装として残しているもの:
 
 - 新商品のプッシュ通知
-- 収集バッチの定期実行設定（cron / GitHub Actions などに載せる）
 
 ## v1.0 でやらないこと
 

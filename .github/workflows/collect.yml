@@ -35,6 +35,15 @@ jobs:
       - run: npm ci
         working-directory: collectors
 
+      - name: 販売終了の反映（毎日）
+        # 提供期間が過ぎた商品を隠す。収集より先に走らせる。
+        if: github.event.schedule == '0 21 * * *' || inputs.job == 'all' || inputs.job == 'news'
+        working-directory: collectors
+        run: npm run expire
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: ニュース収集（毎日）
         if: github.event.schedule == '0 21 * * *' || inputs.job == 'all' || inputs.job == 'news'
         working-directory: collectors

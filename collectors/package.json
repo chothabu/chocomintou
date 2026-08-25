@@ -11,7 +11,8 @@
     "prune": "tsx --env-file-if-exists=.env src/prune.ts",
     "probe:hotpepper": "tsx --env-file-if-exists=.env src/hotpepper-probe.ts",
     "watch:brands": "tsx --env-file-if-exists=.env src/brandwatch.ts",
-    "collect:prtimes": "tsx --env-file-if-exists=.env src/prtimes.ts"
+    "collect:prtimes": "tsx --env-file-if-exists=.env src/prtimes.ts",
+    "expire": "tsx --env-file-if-exists=.env src/expire.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

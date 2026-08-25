@@ -203,4 +203,6 @@ export const BRANDS: Brand[] = [
   { name: 'アフタヌーンティー', domain: 'www.afternoon-tea.com' },  // カフェ 80+店
   { name: 'ウェンディーズ', domain: 'www.wendys.com' },  // バーガー 70+店
   { name: '銀座あけぼの', domain: 'www.ginza-akebono.co.jp' },  // スイーツ/お菓子 70+店
+  // ---- 検索で見つけたチェーン ----
+  { name: 'よーじや', domain: 'www.yojiya.co.jp' },
 ]

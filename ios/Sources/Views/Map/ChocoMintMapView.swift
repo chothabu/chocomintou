@@ -85,6 +85,15 @@ struct ChocoMintMapView: View {
                 .annotationTitles(.hidden)
             }
 
+            // チョコミントを扱っているチェーンの店舗。
+            // 公式の取り扱い表明が根拠なので、目撃ピンとは形を変えて出す。
+            ForEach(model.chainStores) { (store: ChainStore) in
+                Annotation(store.candidate.name, coordinate: store.candidate.coordinate) {
+                    chainStoreView(store)
+                }
+                .annotationTitles(.hidden)
+            }
+
             ForEach(model.pins) { (pin: StorePin) in
                 Annotation(pin.storeName, coordinate: pin.coordinate) {
                     pinView(pin)
@@ -124,10 +133,36 @@ struct ChocoMintMapView: View {
         .animation(.spring(duration: 0.2), value: model.selectedPin?.storeId)
     }
 
+    /// 取り扱いチェーンの店舗。ブランド色の頭文字にして、
+    /// 丸い目撃ピン（🍦）とも、白い小丸（目撃なし）とも見分けられるようにする。
+    private func chainStoreView(_ store: ChainStore) -> some View {
+        Button {
+            model.selectedChainStore = store
+            model.selectedReportable = nil
+            model.selectedPin = nil
+        } label: {
+            Text(store.offering.initialText)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 24, height: 24)
+                .background(Color(hex: store.offering.brandColor) ?? Palette.deepMint,
+                            in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(.white, lineWidth: 1.5)
+                )
+                .shadow(radius: 2, y: 1)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(store.candidate.name)。\(store.offering.chainName)でチョコミントを取り扱い")
+    }
+
     /// 目撃情報が無いお店。中身のない小さな丸にして、目撃ピンと明確に差をつける。
     private func reportableView(_ store: StoreCandidate) -> some View {
         Button {
             model.selectedReportable = store
+            model.selectedChainStore = nil
         } label: {
             Circle()
                 .fill(Color(.systemBackground))
@@ -142,6 +177,9 @@ struct ChocoMintMapView: View {
     @ViewBuilder
     private var bottomBar: some View {
         VStack(spacing: 10) {
+            if let store = model.selectedChainStore {
+                chainStoreCard(store)
+            }
             if let store = model.selectedReportable {
                 reportableCard(store)
             }
@@ -166,9 +204,9 @@ struct ChocoMintMapView: View {
                     ProgressView().controlSize(.small)
                 } else {
                     Text(
-                        model.reportableStores.isEmpty
+                        model.chainStores.isEmpty && model.reportableStores.isEmpty
                             ? "\(model.pins.count)店舗"
-                            : "目撃 \(model.pins.count) / 周辺 \(model.reportableStores.count)"
+                            : "目撃 \(model.pins.count) / 取扱 \(model.chainStores.count) / 周辺 \(model.reportableStores.count)"
                     )
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -178,6 +216,57 @@ struct ChocoMintMapView: View {
             .padding(.vertical, 10)
             .background(.regularMaterial)
         }
+    }
+
+    /// 取り扱いチェーンの店舗を選んだときのカード。
+    /// 「このチェーンで売っている」までは言えるが、その店の在庫は分からない。
+    private func chainStoreCard(_ store: ChainStore) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                ChainMark(offering: store.offering, size: 22)
+                Text(store.candidate.name)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                if let distance = store.candidate.distance {
+                    Text(Formatters.distance(distance))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            ForEach(store.offering.products) { product in
+                NavigationLink(value: AppRoute.product(product)) {
+                    HStack(spacing: 6) {
+                        Image(systemName: product.category.symbolName)
+                            .font(.caption2)
+                            .foregroundStyle(Palette.deepMint)
+                        Text(product.name)
+                            .font(.footnote)
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+
+            Text("このチェーンでの取り扱いを確認しています。店舗ごとの在庫は分かりません。")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+
+            HStack {
+                Spacer()
+                Button("閉じる") { model.selectedChainStore = nil }
+                    .font(.caption)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Metrics.cardCorner))
+        .padding(.horizontal, 12)
     }
 
     /// 目撃情報が無いお店を選んだときのカード。

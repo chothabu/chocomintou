@@ -156,4 +156,30 @@ struct ChainOffering: Identifiable, Hashable, Sendable {
     var initialText: String {
         String(chainName.prefix(1))
     }
+
+    /// 店名がこのチェーンのものか。
+    ///
+    /// 地図から返る店名は「ローソン 渋谷○○店」のように支店名が付くので、
+    /// チェーン名を含むかで判定する。表記ゆれを吸収するため空白と中黒は落とす。
+    func matches(storeName: String) -> Bool {
+        func normalize(_ text: String) -> String {
+            text.replacingOccurrences(of: " ", with: "")
+                .replacingOccurrences(of: "　", with: "")
+                .replacingOccurrences(of: "・", with: "")
+                .replacingOccurrences(of: "-", with: "")
+                .lowercased()
+        }
+        return normalize(storeName).contains(normalize(chainName))
+    }
+}
+
+/// 地図に出す、取り扱いチェーンの店舗。
+///
+/// 「このチェーンで売っている」という公式の事実と、周辺店舗の位置を掛け合わせたもの。
+/// その店に在庫があることの保証ではないので、目撃ピンとは見た目を分ける。
+struct ChainStore: Identifiable, Hashable, Sendable {
+    var candidate: StoreCandidate
+    var offering: ChainOffering
+
+    var id: String { candidate.id }
 }

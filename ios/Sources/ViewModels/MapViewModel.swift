@@ -21,6 +21,11 @@ final class MapViewModel {
     var showsReportableStores = true
     var selectedReportable: StoreCandidate?
 
+    /// 表示中の範囲にある、チョコミントを扱うチェーンの店舗。
+    /// 「このチェーンで売っている」という公式の事実と、周辺店舗の位置を掛け合わせたもの。
+    var chainStores: [ChainStore] = []
+    var selectedChainStore: ChainStore?
+
     private var lastSearchedCenter: CLLocationCoordinate2D?
     private let storeSearch = StoreSearchService()
 
@@ -51,34 +56,56 @@ final class MapViewModel {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? "地図の情報を取得できませんでした。"
         }
 
-        await loadReportableStores(around: center, radiusMeters: radiusMeters)
+        await loadReportableStores(services: services, around: center, radiusMeters: radiusMeters)
     }
 
     /// 周辺のお店を取り直す。目撃済みの店舗は重複するので除く。
     private func loadReportableStores(
+        services: AppServices,
         around center: CLLocationCoordinate2D,
         radiusMeters: Double
     ) async {
         guard showsReportableStores else {
             reportableStores = []
+            chainStores = []
             return
         }
         // 広域では数が多すぎて地図が埋まるので、近距離のときだけ出す。
         guard radiusMeters <= 2000 else {
             reportableStores = []
+            chainStores = []
             return
         }
 
-        let found = (try? await storeSearch.nearbyStores(
+        async let foundTask = (try? await storeSearch.nearbyStores(
             around: center, radiusMeters: min(radiusMeters, 800)
         )) ?? []
+        async let offeringsTask = (try? await services.stores.chainOfferings()) ?? []
+        let (found, offerings) = await (foundTask, offeringsTask)
 
-        // 密集地では同じ場所に重なって団子になるので、近い順に少しだけ出す。
+        // 目撃ピンとして既に出ている店舗は重複させない
         let sighted = Set(pins.map(\.storeName))
-        reportableStores = found
-            .filter { !sighted.contains($0.name) }
-            .prefix(8)
-            .map { $0 }
+        let candidates = found.filter { !sighted.contains($0.name) }
+
+        // 取り扱いチェーンに当たるものは、店舗タブと同じ根拠でピンにする。
+        // 残りは目撃情報が無いお店として、報告先を示すためだけに出す。
+        var matched: [ChainStore] = []
+        var plain: [StoreCandidate] = []
+        for candidate in candidates {
+            if let offering = offerings.first(where: { $0.matches(storeName: candidate.name) }) {
+                matched.append(ChainStore(candidate: candidate, offering: offering))
+            } else {
+                plain.append(candidate)
+            }
+        }
+        chainStores = matched
+        // 密集地では同じ場所に重なって団子になるので、少しだけ出す。
+        reportableStores = plain.prefix(8).map { $0 }
+
+        if let selected = selectedChainStore,
+           !chainStores.contains(where: { $0.id == selected.id }) {
+            selectedChainStore = nil
+        }
     }
 
     /// 前回の検索地点から十分離れたら「このエリアで検索」を出す。

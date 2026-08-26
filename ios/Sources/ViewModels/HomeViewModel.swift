@@ -6,7 +6,6 @@ import Foundation
 @MainActor
 @Observable
 final class HomeViewModel {
-    var nearby: [NearbyStoreProduct] = []
     var newProducts: [Product] = []
     var ranking: [Product] = []
     var sightings: [SightingEntry] = []
@@ -19,29 +18,23 @@ final class HomeViewModel {
 
     private var hasLoaded = false
 
-    func loadIfNeeded(services: AppServices, coordinate: CLLocationCoordinate2D?, cache: CacheStore?) async {
+    func loadIfNeeded(services: AppServices, cache: CacheStore?) async {
         guard !hasLoaded else { return }
-        await load(services: services, coordinate: coordinate, cache: cache)
+        await load(services: services, cache: cache)
     }
 
-    func load(services: AppServices, coordinate: CLLocationCoordinate2D?, cache: CacheStore?) async {
+    /// 近くの店はマップで見られるので、ホームでは位置情報を使わない。
+    func load(services: AppServices, cache: CacheStore?) async {
         isLoading = true
         errorMessage = nil
         isShowingCache = false
         defer { isLoading = false; hasLoaded = true }
 
-        async let nearbyTask: [NearbyStoreProduct] = {
-            guard let coordinate else { return [] }
-            return (try? await services.stores.nearby(
-                coordinate: coordinate, radiusMeters: 3000, productId: nil, onSaleOnly: false
-            )) ?? []
-        }()
         async let newTask = (try? await services.products.newProducts(limit: 10)) ?? []
         async let rankingTask = (try? await services.products.ranking(days: 30, limit: 10)) ?? []
         async let sightingsTask = (try? await services.sightings.recent(limit: 8)) ?? []
         async let newsTask = (try? await services.news.articles(limit: 3)) ?? []
 
-        nearby = await nearbyTask
         newProducts = await newTask
         ranking = await rankingTask
         sightings = await sightingsTask

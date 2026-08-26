@@ -191,6 +191,7 @@ struct ProductDetailView: View {
                     RatingDotsView(title: "チョコ強度", value: product.avgChocolate)
                     RatingDotsView(title: "甘さ", value: product.avgSweetness)
                     RatingDotsView(title: "爽快感", value: product.avgFreshness)
+                    RatingDotsView(title: "食感", value: product.avgTexture)
                 } else {
                     Text("レビューが投稿されると、ミント強度やチョコ強度の平均が表示されます。")
                         .font(.caption)

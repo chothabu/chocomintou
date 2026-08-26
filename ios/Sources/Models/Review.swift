@@ -14,6 +14,8 @@ struct Review: Identifiable, Codable, Hashable, Sendable {
     var chocolateIntensity: Int?
     var sweetness: Int?
     var freshness: Int?
+    /// ザクザク感・口どけなどの食感
+    var texture: Int?
     var comment: String?
 
     var helpfulCount: Int
@@ -39,6 +41,7 @@ struct ReviewDraft: Equatable, Sendable {
     var chocolateIntensity: Int = 0
     var sweetness: Int = 0
     var freshness: Int = 0
+    var texture: Int = 0
     var comment: String = ""
 
     static let commentLimit = 500
@@ -56,6 +59,7 @@ struct ReviewDraft: Equatable, Sendable {
         chocolateIntensity = review.chocolateIntensity ?? 0
         sweetness = review.sweetness ?? 0
         freshness = review.freshness ?? 0
+        texture = review.texture ?? 0
         comment = review.comment ?? ""
     }
 

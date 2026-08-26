@@ -32,7 +32,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: true,
             salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 126, avgOverall: 4.4, avgMint: 4.7, avgChocolate: 3.2,
-            avgSweetness: 4.0, avgFreshness: 4.3, mintLevel: .lv5,
+            avgSweetness: 4.0, avgFreshness: 4.3, avgTexture: nil, mintLevel: .lv5,
             createdAt: daysAgo(30), updatedAt: daysAgo(1)
         ),
         Product(
@@ -43,7 +43,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: false,
             salesChannelText: "全国のスーパー・コンビニ", officialUrl: nil, onlineShopName: nil,
             reviewCount: 84, avgOverall: 4.1, avgMint: 3.4, avgChocolate: 4.1,
-            avgSweetness: 3.8, avgFreshness: 3.2, mintLevel: .lv4,
+            avgSweetness: 3.8, avgFreshness: 3.2, avgTexture: nil, mintLevel: .lv4,
             createdAt: daysAgo(60), updatedAt: daysAgo(3)
         ),
         Product(
@@ -54,7 +54,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: true,
             salesChannelText: "カフェ ミントリーフ 各店", officialUrl: nil, onlineShopName: nil,
             reviewCount: 31, avgOverall: 4.6, avgMint: 3.9, avgChocolate: 4.4,
-            avgSweetness: 4.2, avgFreshness: 4.0, mintLevel: .lv4,
+            avgSweetness: 4.2, avgFreshness: 4.0, avgTexture: nil, mintLevel: .lv4,
             createdAt: daysAgo(90), updatedAt: daysAgo(5)
         ),
         Product(
@@ -65,7 +65,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: false,
             salesChannelText: "銀嶺珈琲 全店", officialUrl: nil, onlineShopName: nil,
             reviewCount: 47, avgOverall: 3.8, avgMint: 2.6, avgChocolate: 3.9,
-            avgSweetness: 4.4, avgFreshness: 2.8, mintLevel: .lv3,
+            avgSweetness: 4.4, avgFreshness: 2.8, avgTexture: nil, mintLevel: .lv3,
             createdAt: daysAgo(20), updatedAt: daysAgo(2)
         ),
         Product(
@@ -76,7 +76,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: false,
             salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 203, avgOverall: 4.2, avgMint: 4.2, avgChocolate: 3.6,
-            avgSweetness: 3.5, avgFreshness: 4.1, mintLevel: .lv4,
+            avgSweetness: 3.5, avgFreshness: 4.1, avgTexture: nil, mintLevel: .lv4,
             createdAt: daysAgo(120), updatedAt: daysAgo(1)
         ),
         Product(
@@ -87,7 +87,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: true,
             salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 12, avgOverall: 3.5, avgMint: 2.1, avgChocolate: 3.3,
-            avgSweetness: 4.1, avgFreshness: 2.2, mintLevel: .lv2,
+            avgSweetness: 4.1, avgFreshness: 2.2, avgTexture: nil, mintLevel: .lv2,
             createdAt: daysAgo(14), updatedAt: daysAgo(1)
         ),
         Product(
@@ -98,7 +98,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: false,
             salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 58, avgOverall: 4.0, avgMint: 3.1, avgChocolate: 4.2,
-            avgSweetness: 4.3, avgFreshness: 3.0, mintLevel: .lv3,
+            avgSweetness: 4.3, avgFreshness: 3.0, avgTexture: nil, mintLevel: .lv3,
             createdAt: daysAgo(40), updatedAt: daysAgo(4)
         ),
         Product(
@@ -109,7 +109,7 @@ enum SampleData {
             saleStatus: .ended, isLimited: true,
             salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 96, avgOverall: 4.3, avgMint: 3.6, avgChocolate: 3.8,
-            avgSweetness: 3.9, avgFreshness: 3.7, mintLevel: .lv4,
+            avgSweetness: 3.9, avgFreshness: 3.7, avgTexture: nil, mintLevel: .lv4,
             createdAt: daysAgo(420), updatedAt: daysAgo(300)
         ),
         Product(
@@ -120,7 +120,7 @@ enum SampleData {
             saleStatus: .onSale, isLimited: false,
             salesChannelText: "全国のスーパー", officialUrl: nil, onlineShopName: nil,
             reviewCount: 311, avgOverall: 4.5, avgMint: 3.8, avgChocolate: 4.5,
-            avgSweetness: 3.6, avgFreshness: 3.9, mintLevel: .lv4,
+            avgSweetness: 3.6, avgFreshness: 3.9, avgTexture: nil, mintLevel: .lv4,
             createdAt: daysAgo(500), updatedAt: daysAgo(2)
         ),
         Product(
@@ -131,7 +131,7 @@ enum SampleData {
             saleStatus: .upcoming, isLimited: true,
             salesChannelText: "全国のコンビニエンスストア", officialUrl: nil, onlineShopName: nil,
             reviewCount: 0, avgOverall: nil, avgMint: nil, avgChocolate: nil,
-            avgSweetness: nil, avgFreshness: nil, mintLevel: nil,
+            avgSweetness: nil, avgFreshness: nil, avgTexture: nil, mintLevel: nil,
             createdAt: daysAgo(5), updatedAt: daysAgo(5)
         ),
     ]
@@ -200,32 +200,32 @@ enum SampleData {
 
     static let reviews: [Review] = [
         Review(id: id(301), userId: id(901), productId: id(1), overallRating: 5,
-               mintIntensity: 5, chocolateIntensity: 3, sweetness: 4, freshness: 5,
+               mintIntensity: 5, chocolateIntensity: 3, sweetness: 4, freshness: 5, texture: nil,
                comment: "かなりミント強い。個人的には今年一番。歯磨き粉とか言わせない。",
                helpfulCount: 12, createdAt: daysAgo(3), updatedAt: daysAgo(3),
                author: Review.ReviewAuthor(id: id(901), displayName: "つよめのチョコミン党")),
         Review(id: id(302), userId: id(902), productId: id(1), overallRating: 4,
-               mintIntensity: 4, chocolateIntensity: 4, sweetness: 4, freshness: 4,
+               mintIntensity: 4, chocolateIntensity: 4, sweetness: 4, freshness: 4, texture: nil,
                comment: "ミントもチョコもしっかり。ただ溶けるのが早い。",
                helpfulCount: 5, createdAt: daysAgo(6), updatedAt: nil,
                author: Review.ReviewAuthor(id: id(902), displayName: "みどりのミント好き")),
         Review(id: id(303), userId: id(903), productId: id(1), overallRating: 3,
-               mintIntensity: 5, chocolateIntensity: 2, sweetness: 3, freshness: 5,
+               mintIntensity: 5, chocolateIntensity: 2, sweetness: 3, freshness: 5, texture: nil,
                comment: "ミントが勝ちすぎてチョコを感じない。強ミント派には刺さると思う。",
                helpfulCount: 21, createdAt: daysAgo(10), updatedAt: nil,
                author: Review.ReviewAuthor(id: id(903), displayName: "ひんやりチョコミンター")),
         Review(id: id(304), userId: id(901), productId: id(5), overallRating: 4,
-               mintIntensity: 4, chocolateIntensity: 4, sweetness: 3, freshness: 4,
+               mintIntensity: 4, chocolateIntensity: 4, sweetness: 3, freshness: 4, texture: nil,
                comment: "定番。安定しておいしい。",
                helpfulCount: 3, createdAt: daysAgo(12), updatedAt: nil,
                author: Review.ReviewAuthor(id: id(901), displayName: "つよめのチョコミン党")),
         Review(id: id(305), userId: id(902), productId: id(9), overallRating: 5,
-               mintIntensity: 4, chocolateIntensity: 5, sweetness: 3, freshness: 4,
+               mintIntensity: 4, chocolateIntensity: 5, sweetness: 3, freshness: 4, texture: nil,
                comment: "チョコチップの量が正義。家に常備している。",
                helpfulCount: 34, createdAt: daysAgo(20), updatedAt: nil,
                author: Review.ReviewAuthor(id: id(902), displayName: "みどりのミント好き")),
         Review(id: id(306), userId: id(903), productId: id(4), overallRating: 3,
-               mintIntensity: 2, chocolateIntensity: 4, sweetness: 5, freshness: 2,
+               mintIntensity: 2, chocolateIntensity: 4, sweetness: 5, freshness: 2, texture: nil,
                comment: "甘い。ミントはほんのり。デザート寄り。",
                helpfulCount: 8, createdAt: daysAgo(8), updatedAt: nil,
                author: Review.ReviewAuthor(id: id(903), displayName: "ひんやりチョコミンター")),

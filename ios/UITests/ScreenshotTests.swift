@@ -28,7 +28,7 @@ final class ScreenshotTests: XCTestCase {
     }
 
     func testCaptureScreens() {
-        _ = app.staticTexts["近くのチョコミント"].waitForExistence(timeout: 15)
+        _ = app.staticTexts["新発売"].waitForExistence(timeout: 15)
         Thread.sleep(forTimeInterval: 1)
         capture("01-home")
 

@@ -41,6 +41,7 @@ struct ReviewCreateView: View {
                     RatingPicker(title: "チョコ強度", value: $draft.chocolateIntensity)
                     RatingPicker(title: "甘さ", value: $draft.sweetness)
                     RatingPicker(title: "爽快感", value: $draft.freshness)
+                    RatingPicker(title: "食感", value: $draft.texture)
                 } header: {
                     Text("詳しい評価")
                 } footer: {

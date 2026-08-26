@@ -4,7 +4,6 @@ import SwiftData
 /// ホーム。「今何があるのか」を見る場所（設計 §4）。
 struct HomeView: View {
     @Environment(SessionStore.self) private var session
-    @Environment(LocationService.self) private var location
     @Environment(\.modelContext) private var modelContext
 
     @State private var model = HomeViewModel()
@@ -19,10 +18,6 @@ struct HomeView: View {
                         cacheNotice
                     }
 
-                    NearbySection(items: model.nearby, isLocationDenied: location.isDenied) {
-                        location.requestAuthorization()
-                    }
-
                     NewProductsSection(products: model.newProducts)
 
                     RankingSection(products: model.ranking)
@@ -35,19 +30,15 @@ struct HomeView: View {
                 .padding(.vertical, 12)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("チョコミン党")
+            // タイトルは出さない。タブで居場所は分かるので、その分を中身に使う
+            .navigationBarTitleDisplayMode(.inline)
             .refreshable { await reload() }
             .appNavigationDestinations()
             .task {
                 await model.loadIfNeeded(
                     services: session.services,
-                    coordinate: location.coordinate,
                     cache: CacheStore(context: modelContext)
                 )
-            }
-            // 位置情報が後から許可されたら、近くのセクションだけ取り直す。
-            .onChange(of: location.coordinate?.latitude) { _, _ in
-                Task { await reload() }
             }
             .sheet(item: $openedArticle) { article in
                 SafariView(url: article.articleUrl)
@@ -159,7 +150,6 @@ struct HomeView: View {
     private func reload() async {
         await model.load(
             services: session.services,
-            coordinate: location.coordinate,
             cache: CacheStore(context: modelContext)
         )
     }

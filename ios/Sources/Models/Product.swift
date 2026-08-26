@@ -33,6 +33,7 @@ struct Product: Identifiable, Codable, Hashable, Sendable {
     var avgChocolate: Double?
     var avgSweetness: Double?
     var avgFreshness: Double?
+    var avgTexture: Double?
     var mintLevel: MintLevel?
 
     var createdAt: Date?

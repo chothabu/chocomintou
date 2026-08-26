@@ -31,11 +31,11 @@ final class ChocoMintUITests: XCTestCase {
     }
 
     func testHomeShowsSections() {
+        // 「近くのチョコミント」はマップに任せたのでホームには無い
         XCTAssertTrue(
-            app.staticTexts["近くのチョコミント"].waitForExistence(timeout: 15),
+            app.staticTexts["新発売"].waitForExistence(timeout: 15),
             "ホームのセクションが表示されない"
         )
-        XCTAssertTrue(app.staticTexts["新発売"].exists)
         XCTAssertTrue(app.staticTexts["今人気のチョコミント"].exists)
     }
 

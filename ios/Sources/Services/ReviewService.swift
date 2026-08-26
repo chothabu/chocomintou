@@ -50,6 +50,7 @@ struct SupabaseReviewService: ReviewServing {
             chocolateIntensity: draft.optionalValue(draft.chocolateIntensity),
             sweetness: draft.optionalValue(draft.sweetness),
             freshness: draft.optionalValue(draft.freshness),
+            texture: draft.optionalValue(draft.texture),
             comment: draft.comment.nilIfBlank,
             updatedAt: PostgresDate.iso8601.string(from: Date())
         )
@@ -122,6 +123,7 @@ struct SupabaseReviewService: ReviewServing {
         let chocolateIntensity: Int?
         let sweetness: Int?
         let freshness: Int?
+        let texture: Int?
         let comment: String?
         let updatedAt: String
     }
